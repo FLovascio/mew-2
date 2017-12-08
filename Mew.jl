@@ -1,6 +1,8 @@
 #includes
 using Base.read
+using Base.eof
 import Base.read
+import Base.eof
 #splash screen
 println("
                                 Welcome to MEW-2                                                                  
@@ -40,10 +42,21 @@ println("
 
 
 #functions
+function getsize_64(stream::IOStream)
+	count =0
+	while !eof(stream)
+		read(stream, Float64)
+		count+=1
+	end
+	close(stream)
+	return count
+end
+
 function read(filename::String)
 	f=open(filename,"r")
-	f_size=getsize(f)
-	Dats=Float64[f_size]
+	f_size=getsize_64(f)
+	f=open(filename,"r")
+	Dats=Array{Float64}(f_size)
 	for i= 1:f_size
 		Dats[i]=read(f,Float64)
 	end
