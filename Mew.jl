@@ -112,4 +112,9 @@ end
 
 #main
 files=get_directory()
+for i=1:length(files)
+	plot(files[i])
+end
+
+
 
