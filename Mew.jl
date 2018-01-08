@@ -89,7 +89,23 @@ function get_name(file::String)
 		return name
 end
 
-function plot(file::String)
+function plot3D_Cartesian(file::String)
+		println("reading from "*file)
+		store=read(file)
+		name=get_name(file)
+		plt=plot(x=(1:length(store)), y=store, Guide.xlabel(), Guide.ylabel(),Geom.line)	
+		draw(SVG(plotname*".svg", 16inch,		 9inch), plt)
+end
+
+function plot3D_Cylindrical(file::String)
+		println("reading from "*file)
+		store=read(file)
+		name=get_name(file)
+		plt=plot(x=(1:length(store)), y=store, Guide.xlabel(), Guide.ylabel(),Geom.line)	
+		draw(SVG(plotname*".svg", 16inch,		 9inch), plt)
+end
+
+function plot3D_Spherical(file::String)
 		println("reading from "*file)
 		store=read(file)
 		name=get_name(file)
