@@ -113,6 +113,30 @@ function plot3D_Spherical(file::String)
 		draw(SVG(plotname*".svg", 16inch,		 9inch), plt)
 end
 
+function plot2D_Polar()
+		println("reading from "*file)
+		store=read(file)
+		name=get_name(file)
+		plt=plot(x=(1:length(store)), y=store, Guide.xlabel(), Guide.ylabel(),Geom.line)	
+		draw(SVG(plotname*".svg", 16inch,		 9inch), plt)
+end
+
+function plot2D_Cartesian()
+		println("reading from "*file)
+		store=read(file)
+		name=get_name(file)
+		plt=plot(x=(1:length(store)), y=store, Guide.xlabel(), Guide.ylabel(),Geom.line)	
+		draw(SVG(plotname*".svg", 16inch,		 9inch), plt)
+end
+
+function plot1D()
+		println("reading from "*file)
+		store=read(file)
+		name=get_name(file)
+		plt=plot(x=(1:length(store)), y=store, Guide.xlabel(), Guide.ylabel(),Geom.line)	
+		draw(SVG(plotname*".svg", 16inch,		 9inch), plt)
+end
+
 function get_directory()
 		list=filter(x -> contains(x, ".dat"),readdir())
 		return list
