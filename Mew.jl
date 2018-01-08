@@ -111,9 +111,11 @@ function get_outputs(fname::String)
 end
 
 #main
-files=get_directory()
-for i=1:length(files)
-	plot(files[i])
+function main()
+		files=get_directory()
+		for i=1:length(files)
+			plot(files[i])
+		end
 end
 
 
