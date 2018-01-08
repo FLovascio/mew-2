@@ -89,6 +89,33 @@ function get_name(file::String)
 		return name
 end
 
+function to_mesh(file::String, dimensions::UInt16, mesh_size::Array{Int,1})
+		data=read(file)
+		mesh=Array{Float64,dimensions}
+		if dimensions==1
+				mesh=data
+				return mesh
+		end
+		if dimensions==2
+				for i=1:mesh_size[1]
+						for j=1:mesh_size[2]
+								mesh[i][j]=data[i*j]
+						end
+				end
+				return mesh
+		end
+		if dimensions==3
+				for i=1:mesh_size[1]
+						for j=1:mesh_size[2]
+								for k=1:mesh_size[3]
+										mesh[i][j][k]=data[i*j*k]
+								end
+						end
+				end 
+				return mesh
+		end
+end
+
 function plot3D_Cartesian(file::String)
 		println("reading from "*file)
 		store=read(file)
