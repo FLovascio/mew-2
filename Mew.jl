@@ -91,12 +91,13 @@ end
 
 function to_mesh(file::String, dimensions::UInt16, mesh_size::Array{Int,1})
 		data=read(file)
-		mesh=Array{Float64,dimensions}
 		if dimensions==1
+			mesh=Array{Float64}(mesh_size[1])
 				mesh=data
 				return mesh
 		end
 		if dimensions==2
+			mesh=Array{Float64}(mesh_size[1], mesh_size[2])
 				for i=1:mesh_size[1]
 						for j=1:mesh_size[2]
 								mesh[i][j]=data[i*j]
@@ -105,6 +106,7 @@ function to_mesh(file::String, dimensions::UInt16, mesh_size::Array{Int,1})
 				return mesh
 		end
 		if dimensions==3
+			mesh=Array{Float64}(mesh_size[1], mesh_size[2], mesh_size[3])
 				for i=1:mesh_size[1]
 						for j=1:mesh_size[2]
 								for k=1:mesh_size[3]
@@ -115,6 +117,9 @@ function to_mesh(file::String, dimensions::UInt16, mesh_size::Array{Int,1})
 				return mesh
 		end
 end
+
+function vertical_integration(strucured_data::Array{Float64,3})
+	integrated_data=Float64
 
 function plot3D_Cartesian(file::String)
 		println("reading from "*file)
