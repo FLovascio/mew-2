@@ -122,7 +122,16 @@ end
 
 function vertical_integration(strucured_data::Array{Float64,3})
 		integrated_data=Array{Float64,2}
-end 
+		for i=1:size(strucured_data,1)
+				for j=1:size(strucured_data,2)
+						tmp=0.0
+						for k=1:size(strucured_data,3)
+								tmp=tmp+strucured_data[i,j,k]
+						end
+						integrated_data[i,j]=tmp
+				end
+		end
+end
 
 function plot3D_Cartesian(file::String)
 		println("reading from "*file)
