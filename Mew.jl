@@ -100,7 +100,7 @@ function to_mesh(file::String, dimensions::UInt16, mesh_size::Array{Int,1})
 			mesh=Array{Float64}(mesh_size[1], mesh_size[2])
 				for i=1:mesh_size[1]
 						for j=1:mesh_size[2]
-								mesh[i][j]=data[i*j]
+								mesh[i,j]=data[i*j]
 						end
 				end
 				return mesh
@@ -110,7 +110,7 @@ function to_mesh(file::String, dimensions::UInt16, mesh_size::Array{Int,1})
 				for i=1:mesh_size[1]
 						for j=1:mesh_size[2]
 								for k=1:mesh_size[3]
-										mesh[i][j][k]=data[i*j*k]
+										mesh[i,j,k]=data[i*j*k]
 								end
 						end
 				end 
@@ -119,7 +119,8 @@ function to_mesh(file::String, dimensions::UInt16, mesh_size::Array{Int,1})
 end
 
 function vertical_integration(strucured_data::Array{Float64,3})
-	integrated_data=Float64
+		integrated_data=Array{Float64,2}
+		for 
 
 function plot3D_Cartesian(file::String)
 		println("reading from "*file)
