@@ -3,6 +3,8 @@ using Base.read
 using Base.eof
 import Base.read
 import Base.eof
+using Gadfly
+import Gadfly
 #splash screen
 println("
                               ##Welcome to MEW-2##                                                                  
@@ -120,7 +122,7 @@ end
 
 function vertical_integration(strucured_data::Array{Float64,3})
 		integrated_data=Array{Float64,2}
-		for 
+end 
 
 function plot3D_Cartesian(file::String)
 		println("reading from "*file)
@@ -146,7 +148,7 @@ function plot3D_Spherical(file::String)
 		draw(SVG(plotname*".svg", 16inch,		 9inch), plt)
 end
 
-function plot2D_Polar()
+function plot2D_Polar(file::String)
 		println("reading from "*file)
 		store=read(file)
 		name=get_name(file)
@@ -154,7 +156,7 @@ function plot2D_Polar()
 		draw(SVG(plotname*".svg", 16inch,		 9inch), plt)
 end
 
-function plot2D_Cartesian()
+function plot2D_Cartesian(file::String)
 		println("reading from "*file)
 		store=read(file)
 		name=get_name(file)
@@ -162,11 +164,12 @@ function plot2D_Cartesian()
 		draw(SVG(plotname*".svg", 16inch,		 9inch), plt)
 end
 
-function plot1D()
+function plot1D(file::String)
 		println("reading from "*file)
+		plotname="tst"
 		store=read(file)
 		name=get_name(file)
-		plt=plot(x=(1:length(store)), y=store, Guide.xlabel(), Guide.ylabel(),Geom.line)	
+		plt=plot(x=(1:length(store)), y=store, Guide.xlabel("x"), Guide.ylabel("y"),Geom.line)	
 		draw(SVG(plotname*".svg", 16inch,		 9inch), plt)
 end
 
@@ -187,9 +190,9 @@ end
 function main()
 		files=get_directory()
 		for i=1:length(files)
-			plot(files[i])
+			plot1D(files[i])
 		end
 end
 
-
+a=main()
 
