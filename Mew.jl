@@ -5,6 +5,9 @@ import Base.read
 import Base.eof
 using Gadfly
 import Gadfly
+#using GLPlot
+#import GLPlot
+
 #splash screen
 println("
                               ##Welcome to MEW-2##                                                                  
@@ -180,6 +183,7 @@ function plot1D(file::String)
 		name=get_name(file)
 		plt=plot(x=(1:length(store)), y=store, Guide.xlabel("x"), Guide.ylabel("y"),Geom.line)	
 		draw(SVG(plotname*".svg", 16inch,		 9inch), plt)
+		return plt
 end
 
 function get_directory()
@@ -198,10 +202,11 @@ end
 #main
 function main()
 		files=get_directory()
+		plot_array=Array{}
 		for i=1:length(files)
-			plot1D(files[i])
+				vcat(plot_array,plot1D(files[i]))
 		end
+		return plot_array
 end
 
 a=main()
-

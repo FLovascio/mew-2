@@ -1,2 +1,2 @@
-# Mew-2
-A smart data visualisation code for simlation data.
+# µ-2
+A nearly psychic data visualisation code for simlation data.
