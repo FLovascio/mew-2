@@ -3,14 +3,12 @@ using Base.read
 using Base.eof
 import Base.read
 import Base.eof
-using Gadfly
-import Gadfly
-#using GLPlot
-#import GLPlot
-
+using Plots
+import Plots
+plotly()
 #splash screen
 println("
-                              ##Welcome to MEW-2##                                                                  
+                              ##Welcome to µ-2##                                                                  
               ,,,,,,,,.                                  ,*/,.                 
               ./&@@@@@@&*,,                             ./&@@%**.              
                  ./@@@@@@@@(*                            /#@@@@@(,             
@@ -46,21 +44,6 @@ println("
 #type
 
 #plot themes
-dark_panel = Theme(
-		panel_fill="grey",
-		default_color="green",
-		major_label_font_size=16pt,
-		minor_label_font_size=14pt,
-		major_label_color="black"
-)
-
-light_panel = Theme(
-		panel_fill="white",
-		default_color="green",
-		major_label_font_size=16pt,
-		minor_label_font_size=14pt,
-		major_label_color="black"
-)
 
 #functions
 function getsize_64(stream::IOStream)
@@ -136,54 +119,13 @@ function vertical_integration(strucured_data::Array{Float64,3})
 		end
 end
 
-function plot3D_Cartesian(file::String)
-		println("reading from "*file)
-		store=read(file)
-		name=get_name(file)
-		plt=plot(x=(1:length(store)), y=store, Guide.xlabel(), Guide.ylabel(),Geom.line)	
-		draw(SVG(plotname*".svg", 16inch,		 9inch), plt)
-end
-
-function plot3D_Cylindrical(file::String)
-		println("reading from "*file)
-		store=read(file)
-		name=get_name(file)
-		plt=plot(x=(1:length(store)), y=store, Guide.xlabel(), Guide.ylabel(),Geom.line)	
-		draw(SVG(plotname*".svg", 16inch,		 9inch), plt)
-end
-
-function plot3D_Spherical(file::String)
-		println("reading from "*file)
-		store=read(file)
-		name=get_name(file)
-		plt=plot(x=(1:length(store)), y=store, Guide.xlabel(), Guide.ylabel(),Geom.line)	
-		draw(SVG(plotname*".svg", 16inch,		 9inch), plt)
-end
-
-function plot2D_Polar(file::String)
-		println("reading from "*file)
-		store=read(file)
-		name=get_name(file)
-		plt=plot(x=(1:length(store)), y=store, Guide.xlabel(), Guide.ylabel(),Geom.line)	
-		draw(SVG(plotname*".svg", 16inch,		 9inch), plt)
-end
-
-function plot2D_Cartesian(file::String)
-		println("reading from "*file)
-		store=read(file)
-		name=get_name(file)
-		plt=plot(x=(1:length(store)), y=store, Guide.xlabel(), Guide.ylabel(),Geom.line)	
-		draw(SVG(plotname*".svg", 16inch,		 9inch), plt)
-end
-
 function plot1D(file::String)
 		println("reading from "*file)
 		plotname="tst"
 		store=read(file)
 		name=get_name(file)
-		plt=plot(x=(1:length(store)), y=store, Guide.xlabel("x"), Guide.ylabel("y"),Geom.line)	
-		draw(SVG(plotname*".svg", 16inch,		 9inch), plt)
-		return plt
+		Rng=collect(1:length(store))
+		plot(Rng, store)	
 end
 
 function get_directory()
@@ -200,13 +142,12 @@ function get_outputs(fname::String)
 end
 
 #main
-function main()
-		files=get_directory()
-		plot_array=Array{}
-		for i=1:length(files)
-				vcat(plot_array,plot1D(files[i]))
-		end
-		return plot_array
+
+files=get_directory()
+plot_array=Array{}
+for i=1:length(files)
+		gui(plot1D(files[i]))
 end
 
-a=main()
+
+
