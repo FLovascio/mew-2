@@ -146,7 +146,10 @@ end
 files=get_directory()
 plot_array=Array{}
 for i=1:length(files)
-		gui(plot1D(files[i]))
+		plt=plot1D(files[i])
+		xlabel!("X")
+		ylabel!("Y")
+		gui(plt)
 end
 
 
