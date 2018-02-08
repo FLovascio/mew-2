@@ -132,6 +132,8 @@ end
 
 function get_directory()
 		list=filter(x -> contains(x, ".dat"),readdir())
+		list=filter(x -> contains(x, "gas"),list)
+#		list=filter(x -> contains(x, "00"),list)
 		return list
 end
 
@@ -149,7 +151,7 @@ files=get_directory()
 plot_array=Array{}
 for i=1:length(files)
 		plt=plot1D(files[i])
-		xlabel!("X")
+		xlabel!(files[i])
 		ylabel!("Y")
 		gui(plt)
 end
