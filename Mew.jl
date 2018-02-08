@@ -49,8 +49,10 @@ println("
 function getsize_64(stream::IOStream)
 		count =0
 		while !eof(stream)
+				#println(eof(stream))
 				read(stream, Float64)
 				count+=1
+				println(count)
 		end
 		close(stream)
 		return count
