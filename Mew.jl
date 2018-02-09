@@ -52,7 +52,7 @@ function getsize_64(stream::IOStream)
 				#println(eof(stream))
 				read(stream, Float64)
 				count+=1
-				println(count)
+				#println(count)
 		end
 		close(stream)
 		return count
@@ -127,7 +127,7 @@ function plot1D(file::String)
 		store=read(file)
 		name=get_name(file)
 		Rng=collect(1:length(store))
-		plot(Rng, store)	
+		return plot(Rng, store)	
 end
 
 function get_directory()
@@ -147,14 +147,26 @@ end
 
 #main
 
-files=get_directory()
-plot_array=Array{}
-for i=1:length(files)
-		plt=plot1D(files[i])
-		xlabel!(files[i])
-		ylabel!("Y")
-		gui(plt)
+
+function plt(ID::String, number::Int)
+	files=get_directory()
+	list=filter(x -> contains(x, string(number)*"."),list)
+	list=filter(x -> contains(x, ID),list)
+	for i=1:length(files)
+			plt=plot1D(files[i])
+			xlabel!(files[i])
+			ylabel!("Y")
+			gui(plt)
+	end
 end
 
+function Gif(ID::String)
+	plotlyjs()
+	names=get_directory()
+	names=filter(x -> contains(x, ID), names)
+	@gif for i=0:(length(names)-1)
+		plot1D("gas"*ID*string(i)*".dat")
+	end every 20
+end
 
-
+Gif("dens")
