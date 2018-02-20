@@ -5,7 +5,7 @@ import Base.read
 import Base.eof
 using Plots
 import Plots
-plotly()
+#plotly()
 #splash screen
 println("
                               ##Welcome to µ-2##                                                                  
@@ -149,12 +149,14 @@ end
 
 
 function plt(ID::String, number::Int)
+	plotly()
 	files=get_directory()
-	list=filter(x -> contains(x, string(number)*"."),list)
-	list=filter(x -> contains(x, ID),list)
-	for i=1:length(files)
-			plt=plot1D(files[i])
-			xlabel!(files[i])
+	list=filter(x -> contains(x, "gas"*ID*string(number)*"."),files)
+	println(list)
+	#list=filter(x -> contains(x, ID),list)
+	for i=1:length(list)
+			plt=plot1D(list[i])
+			xlabel!(list[i])
 			ylabel!("Y")
 			gui(plt)
 	end
@@ -169,4 +171,13 @@ function Gif(ID::String)
 	end every 20
 end
 
-Gif("dens")
+
+#Gif("energy")
+plt("energy", 336)
+plt("energy", 330)
+plt("energy", 300)
+plt("energy", 250)
+plt("energy", 200)
+plt("energy", 150)
+plt("energy", 100)
+
