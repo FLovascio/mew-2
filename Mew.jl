@@ -145,6 +145,14 @@ function get_outputs(fname::String)
 		return Dats
 end
 
+function peak_find(ID::String, n::Int)
+	list=filter(x->contains(x,".dat"),readdir())
+	list=filter(x -> contains(x, "gas"*ID*string(number)*"."),list)
+	DATA=read(list[1])
+
+
+
+
 #main
 
 
@@ -170,14 +178,4 @@ function Gif(ID::String)
 		plot1D("gas"*ID*string(i)*".dat")
 	end every 20
 end
-
-
-#Gif("energy")
-plt("energy", 336)
-plt("energy", 330)
-plt("energy", 300)
-plt("energy", 250)
-plt("energy", 200)
-plt("energy", 150)
-plt("energy", 100)
 
