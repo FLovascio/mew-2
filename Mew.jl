@@ -150,6 +150,9 @@ function peak_find(ID::String, n::Int)
 	list=filter(x -> contains(x, "gas"*ID*string(number)*"."),list)
 	DATA=read(list[1])
 
+	for i=1:length(DATA)
+		if(
+
 
 
 
