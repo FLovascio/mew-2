@@ -149,15 +149,21 @@ function peak_find(ID::String, n::Int)
 	list=filter(x->contains(x,".dat"),readdir())
 	list=filter(x -> contains(x, "gas"*ID*string(number)*"."),list)
 	DATA=read(list[1])
+  return maximum(DATA)
+end
 
-	for i=1:length(DATA)
-		if(
-
-
-
+function peak_find(ID::String)
+		list=filter(x->contains(x,".dat"),readdir())
+		list=filter(x->contains(x,"gas"*ID),list)
+		PEAKS=Array{Float64,2}
+		for i=0:(length(list)-1)
+				DATA=read("gas"*ID*string(i)*".dat")
+				vcat(PEAKS,[i,maximum(DATA)])
+		end
+		return PEAKS
+end
 
 #main
-
 
 function plt(ID::String, number::Int)
 	plotly()
