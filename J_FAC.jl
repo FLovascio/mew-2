@@ -332,8 +332,9 @@ Noise_Files=get_noise_files()
 #End
 
 #User Functions
-function fast_analysis(
-
+function fast_analysis()
+end
+#=
 for i=1:length(Noises)
 	SD=read_to_SD(Noises[i])
 	SD.t=map(x->1000000*x,SD.t)
@@ -407,3 +408,4 @@ end
 
 writedlm("ANALS.csv", DATASTORE, ",")
 writedlm("NANALS.csv", NDATASTORE, ",")
+=#
