@@ -166,7 +166,7 @@ end
 #main
 
 function plt(ID::String, number::Int)
-	plotly()
+	gr()
 	files=get_directory()
 	list=filter(x -> contains(x, "gas"*ID*string(number)*"."),files)
 	println(list)
