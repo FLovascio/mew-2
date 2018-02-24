@@ -5,8 +5,6 @@ plotting_enabled=true
 import Plots
 using Plots
 
-gr()
-
 #PLOTTING SETUP
 
 #Itrductory message
@@ -204,47 +202,6 @@ function hipass(x::Array{Complex128})
 	return x
 end
 
-function noise_cancel_old(noise::Array{Float64,1}, dirtySignal::Array{Float64,1})
-	#A noise cancelling method based on the Ephraim-Malah algorithm
-	cleanSignal= Complex128[]
-	noisePad= Float64[]
-	SigPad= Float64[]
-	noisePad= noise
-	SigPad= dirtySignal
-#=	if length(noise) < length(dirtySignal)
-		noisePad= [noise; zeros(eltype(noise), length(dirtySignal) - length(noise))]
-		SigPad= dirtySignal
-	end
-	if length(noise) > length(dirtySignal)
-		SigPad= [dirtySignal; zeros(eltype(dirtySignal), length(dirtySignal) - length(noise))]
-		noisePad= noise
-	end
-	ftNoise= fft(noisePad)
-  println(summary(ftNoise))=#
-	ftSig= fft(dirtySignal)
-	#ftSig= fft(SigPad)
-  println(summary(ftSig))
-  Clean=Complex{Float64}[]
-	#=Clean= [(conj(ftSig[i])*ftSig[i])-(conj(ftNoise[i])*ftNoise[i]) for i=1:length(ftSig)]
-  for i=1:length(ftSig)
-    #i=5
-    number=Complex{Float64}
-    number=complex((real(ftSig[i]))^2 -((real(ftNoise[i]))^2), imag(ftSig[i]))
-    #println(summary(number))
-    Clean=vcat(Clean,number)
-  end
-	#Clean= [(((real(ftSig[i]))^2)-((real(ftNoise[i]))^2)) for i=1:length(ftSig)]
-	Clean= map(z->neg_to_zero(z),Clean)
-	Clean= map(z->sqrt(z), Clean)
-	println(summary(Clean))=#
-	Clean=lowpass(ftSig)
-	cleanSignal=ifft(Clean)
-	#cleanSignal=ifft(ftSig)
-	#cleanSignal=map(x->real(x), cleanSignal)
-	#cleanSignal=map(x->abs(x), ftSig)
-	return cleanSignal
-end
-
 function peakfind_real(data::Array{Complex128,1})
 	location_1::Array{Number,0,0.0}
 	location_2::Array{Number,0,0.0}
@@ -347,20 +304,35 @@ function get_ID_from_name(nme::String)
 	return String(list[1])
 end
 
+function get_noise_files()
+		Names=search_directory(".csv")
+		Names=map(x->get_name_from_dir(x), Names)
+		Noises=filter(x -> contains(x, "n"),Names)
+		return Noises
+end
+
+function get_sig_files()
+		Names=search_directory(".csv")
+		Names=map(x->get_name_from_dir(x), Names)
+		Sigs=filter!(x -> !(contains(x, "n")),Names)
+		Sigs=filter!(x -> !(contains(x, "ANALS")),Sigs)
+		return Sigs
+end
+
+
 #End
 
-#MAIN
+#Globals
 
-Names=search_directory(".csv")
-Names=map(x->get_name_from_dir(x), Names)
-IDs=map(x->get_ID_from_name(x), Names)
-println("Reading from the filespace: ",Names)
-CLEANV=Complex{Float64}[]
-Noises=filter(x -> contains(x, "n"),Names)
-Sigs=filter!(x -> !(contains(x, "n")),Names)
-Sigs=filter!(x -> !(contains(x, "ANALS")),Sigs)
 DATASTORE=["NAME" "integral" "std_dev" "Peak" "sig to noise"]
 NDATASTORE=["NAME" "integral" "std_dev"]
+Signal_Files=get_sig_files()
+Noise_Files=get_noise_files()
+
+#End
+
+#User Functions
+function fast_analysis(
 
 for i=1:length(Noises)
 	SD=read_to_SD(Noises[i])
