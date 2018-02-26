@@ -5,6 +5,7 @@ import Base.read
 import Base.eof
 using Plots
 import Plots
+gr()
 #plotly()
 #splash screen
 println("
@@ -165,8 +166,7 @@ end
 
 #main
 
-function plt(ID::String, number::Int)
-	gr()
+function Plt(ID::String, number::Int)
 	files=get_directory()
 	list=filter(x -> contains(x, "gas"*ID*string(number)*"."),files)
 	println(list)
@@ -180,11 +180,20 @@ function plt(ID::String, number::Int)
 end
 
 function Gif(ID::String)
-	plotlyjs()
-	names=get_directory()
-	names=filter(x -> contains(x, ID), names)
-	@gif for i=0:(length(names)-1)
-		plot1D("gas"*ID*string(i)*".dat")
-	end every 20
+		names=get_directory()
+		names=filter(x -> contains(x, ID), names)
+		anim = @animate for i=1:length(names)
+    		plot1D("gas"*ID*string(i)*".dat")
+		end
+		gif(anim, "ID.gif", fps = 30)
 end
 
+function Plot_Array(arr::Array{Float64,2})
+		plt=plot(arr[1,...],arr[2,...])
+		gui(plt)
+end
+
+function Plot_Array(arr::Array{Float64,1})
+		plt=plot(0:(length(arr)-1),arr)
+		gui(plt)
+end
