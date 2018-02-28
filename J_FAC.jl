@@ -267,8 +267,6 @@ end
 function noise_cancel_peak_find(noise::Array{Float64,1}, dirtySignal::Array{Float64,1})
 	ftSig= fft(dirtySignal)
 	peaks= peakfind_real(ftSig)
-	
-	
 end
 
 function Sigma_Noise(data::Array{Float64,1})
@@ -319,8 +317,8 @@ function get_sig_files()
 		return Sigs
 end
 
-
 #End
+
 
 #Globals
 
@@ -331,81 +329,70 @@ Noise_Files=get_noise_files()
 
 #End
 
+
 #User Functions
-function fast_analysis()
-end
-#=
-for i=1:length(Noises)
-	SD=read_to_SD(Noises[i])
-	SD.t=map(x->1000000*x,SD.t)
-	SD.V=map(x->1000*x,SD.V)
-	ofst=offset(SD)
-	SDpos=strip_negative_time(SD)
-	SDPoffset=SDpos
-	SDPoffset.V=map(x->x-ofst, SDpos.V)
-	SD.V=map(x->x-ofst, SD.V)
-	println("integral: ",num_integrate(SDPoffset))
-	integral=num_integrate(SDPoffset)
-	#if backend=="MP"
-	#   x=SD.t
-	#   y=SD.V
-  #end
-	sdev=Sigma_Noise(SD.V)
-	println(sdev)
-		plt=plot(SD.t,SD.V, xlabel="Time (us)")
-		vline!([0.])
-				ylabel!("Voltage (mV)")
-		#title!(Noises[i])
-		#gui(plt)
-		savefig(plt, get_ID_from_name(Noises[i]))
 
-		SPEC=spectral_series(SD.V)
-		plts=plot(SPEC)
-		savefig(plts, "SPEC_"*get_ID_from_name(Noises[i]))
-		DATATEMP=[Noises[i] integral sdev]
-		NDATASTORE=vcat(NDATASTORE,DATATEMP)
-	#noise=strip_positive_time(SD)
-	#CLEANV=noise_cancel(noise.V,SD.V)
-end
-
-for i=1:length(Sigs)
-	SD=read_to_SD(Sigs[i])
-	SD.t=map(x->1000000*x,SD.t)
-	SD.V=map(x->1000*x,SD.V)
-	ofst=offset(SD)
-	SDpos=strip_negative_time(SD)
-	SDPoffset=SDpos
-	SDPoffset.V=map(x->x-ofst, SDpos.V)
-	SD.V=map(x->x-ofst, SD.V)
-	println("integral: ",num_integrate(SDPoffset))
-	integral=num_integrate(SDPoffset)
-	#if backend=="MP"
-	#   x=SD.t
-	#   y=SD.V
-  #end
-	NEG=strip_positive_time(SD)
-	sdev=Sigma_Noise(NEG.V)
-	Peak=peakfinder(SD.V)
-	println("peak:", Peak)
-	println("Sigma:",sdev)
-		plt=plot(SD.t,SD.V, xlabel="Time (us)")
-		vline!([0.])
-				ylabel!("Voltage (mV)")
-		#title!(Sigs[i])
-		#gui(plt)
-		savefig(plt, get_ID_from_name(Sigs[i]))
-		
-		SPEC=spectral_series(SD.V)
-		plts=plot(SPEC)
-		savefig(plts, "SPEC_"*get_ID_from_name(Sigs[i]))
-	
-	sig_to_noise=Peak/sdev
-	#noise=strip_positive_time(SD)
-	#CLEANV=noise_cancel(noise.V,SD.V)
-	DATATEMP=[Sigs[i] integral sdev Peak sig_to_noise]
-	DATASTORE=vcat(DATASTORE,DATATEMP)
+function fast_analysis(set::String)
+	if set=="Noise"||set=="noise"
+		for i=1:length(Noises)
+			SD=read_to_SD(Noises[i])
+			SD.t=map(x->1000000*x,SD.t)
+			SD.V=map(x->1000*x,SD.V)
+			ofst=offset(SD)
+			SDpos=strip_negative_time(SD)
+			SDPoffset=SDpos
+			SDPoffset.V=map(x->x-ofst, SDpos.V)
+			SD.V=map(x->x-ofst, SD.V)
+			println("integral: ",num_integrate(SDPoffset))
+			integral=num_integrate(SDPoffset)
+			sdev=Sigma_Noise(SD.V)
+			println(sdev)
+			
+			plt=plot(SD.t,SD.V, xlabel="Time (us)")
+			vline!([0.])
+			ylabel!("Voltage (mV)")
+			savefig(plt, get_ID_from_name(Noises[i]))
+			
+			SPEC=spectral_series(SD.V)
+			plts=plot(SPEC)
+			savefig(plts, "SPEC_"*get_ID_from_name(Noises[i]))
+			DATATEMP=[Noises[i] integral sdev]
+			NDATASTORE=vcat(NDATASTORE,DATATEMP)
+		end
+	elseif set=="signals"||"Signals"
+		for i=1:length(Sigs)
+			SD=read_to_SD(Sigs[i])
+			SD.t=map(x->1000000*x,SD.t)
+			SD.V=map(x->1000*x,SD.V)
+			ofst=offset(SD)
+			SDpos=strip_negative_time(SD)
+			SDPoffset=SDpos
+			SDPoffset.V=map(x->x-ofst, SDpos.V)
+			SD.V=map(x->x-ofst, SD.V)
+			println("integral: ",num_integrate(SDPoffset))
+			integral=num_integrate(SDPoffset)
+			NEG=strip_positive_time(SD)
+			sdev=Sigma_Noise(NEG.V)
+			Peak=peakfinder(SD.V)
+			println("peak:", Peak)
+			println("Sigma:",sdev)
+			
+			plt=plot(SD.t,SD.V, xlabel="Time (us)")
+			vline!([0.])
+			ylabel!("Voltage (mV)")
+			savefig(plt, get_ID_from_name(Sigs[i]))
+			
+			SPEC=spectral_series(SD.V)
+			plts=plot(SPEC)
+			savefig(plts, "SPEC_"*get_ID_from_name(Sigs[i]))
+			sig_to_noise=Peak/sdev
+			DATATEMP=[Sigs[i] integral sdev Peak sig_to_noise]
+			DATASTORE=vcat(DATASTORE,DATATEMP)
+		end
+	end
 end
 
-writedlm("ANALS.csv", DATASTORE, ",")
-writedlm("NANALS.csv", NDATASTORE, ",")
-=#
+function Write_Analysis()
+	writedlm("ANALS.csv", DATASTORE, ",")
+	writedlm("NANALS.csv", NDATASTORE, ",")
+end
