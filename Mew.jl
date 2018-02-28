@@ -189,7 +189,7 @@ function Gif(ID::String)
 end
 
 function Plot_Array(arr::Array{Float64,2})
-		plt=plot(arr[1,...],arr[2,...])
+		plt=plot(arr[1, ],arr[2, ])
 		gui(plt)
 end
 
