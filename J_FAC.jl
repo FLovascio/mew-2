@@ -6,6 +6,7 @@ import Plots
 using Plots
 
 #PLOTTING SETUP
+pgfplots()
 
 #Itrductory message
 println("
