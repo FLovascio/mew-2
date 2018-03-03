@@ -324,7 +324,6 @@ end
 
 #Globals
 
-NDATASTORE=["NAME" "integral" "std_dev"]
 Signal_Files=get_sig_files()
 Noise_Files=get_noise_files()
 Sigs=Signal_Files
@@ -334,11 +333,15 @@ Noises=Noise_Files
 
 
 #User Functions
+function rescan()
+		Sigs=get_sig_files()
+		Noises=get_noise_files()
+end
 
 function fast_analysis(set::String)
-DATASTORE=["NAME" "integral" "std_dev" "Peak" "sig to noise"]
 
 	if set=="Noise"||set=="noise"
+		NDATASTORE=["NAME" "integral" "std_dev"]	
 		for i=1:length(Noises)
 			SD=read_to_SD(Noises[i])
 			SD.t=map(x->1000000*x,SD.t)
@@ -365,6 +368,7 @@ DATASTORE=["NAME" "integral" "std_dev" "Peak" "sig to noise"]
 			NDATASTORE=vcat(NDATASTORE,DATATEMP)
 		end
 	elseif set=="signals"||"Signals"
+		DATASTORE=["NAME" "integral" "std_dev" "Peak" "sig to noise"]
 		for i=1:length(Sigs)
 			SD=read_to_SD(Sigs[i])
 			SD.t=map(x->1000000*x,SD.t)
