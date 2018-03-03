@@ -349,14 +349,14 @@ function fast_analysis(set::String)
 			sdev=Sigma_Noise(SD.V)
 			println(sdev)
 			
-			plt=plot(SD.t,SD.V, xlabel="Time (us)")
+			plt=plot(SD.t,SD.V, xlabel="Time ($ \mu s$)")
 			vline!([0.])
 			ylabel!("Voltage (mV)")
 			savefig(plt, get_ID_from_name(Noises[i]))
 			
-			SPEC=spectral_series(SD.V)
-			plts=plot(SPEC)
-			savefig(plts, "SPEC_"*get_ID_from_name(Noises[i]))
+			#SPEC=spectral_series(SD.V)
+			#plts=plot(SPEC)
+			#savefig(plts, "SPEC_"*get_ID_from_name(Noises[i]))
 			DATATEMP=[Noises[i] integral sdev]
 			NDATASTORE=vcat(NDATASTORE,DATATEMP)
 		end
@@ -378,14 +378,14 @@ function fast_analysis(set::String)
 			println("peak:", Peak)
 			println("Sigma:",sdev)
 			
-			plt=plot(SD.t,SD.V, xlabel="Time (us)")
+			plt=plot(SD.t,SD.V, xlabel="Time ($\mu s$)")
 			vline!([0.])
 			ylabel!("Voltage (mV)")
 			savefig(plt, get_ID_from_name(Sigs[i]))
 			
-			SPEC=spectral_series(SD.V)
-			plts=plot(SPEC)
-			savefig(plts, "SPEC_"*get_ID_from_name(Sigs[i]))
+			#SPEC=spectral_series(SD.V)
+			#plts=plot(SPEC)
+			#savefig(plts, "SPEC_"*get_ID_from_name(Sigs[i]))
 			sig_to_noise=Peak/sdev
 			DATATEMP=[Sigs[i] integral sdev Peak sig_to_noise]
 			DATASTORE=vcat(DATASTORE,DATATEMP)
