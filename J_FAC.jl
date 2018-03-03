@@ -367,6 +367,7 @@ function fast_analysis(set::String)
 			DATATEMP=[Noises[i] integral sdev]
 			NDATASTORE=vcat(NDATASTORE,DATATEMP)
 		end
+		return NDATASTORE
 	elseif set=="signals"||"Signals"
 		DATASTORE=["NAME" "integral" "std_dev" "Peak" "sig to noise"]
 		for i=1:length(Sigs)
@@ -399,6 +400,7 @@ function fast_analysis(set::String)
 			DATATEMP=[Sigs[i] integral sdev Peak sig_to_noise]
 			DATASTORE=vcat(DATASTORE,DATATEMP)
 		end
+		return DATASTORE
 	end
 end
 
