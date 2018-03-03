@@ -6,6 +6,7 @@ import Plots
 using Plots
 
 #PLOTTING SETUP
+using LaTeXStrings
 pgfplots()
 
 #Itrductory message
@@ -323,10 +324,11 @@ end
 
 #Globals
 
-DATASTORE=["NAME" "integral" "std_dev" "Peak" "sig to noise"]
 NDATASTORE=["NAME" "integral" "std_dev"]
 Signal_Files=get_sig_files()
 Noise_Files=get_noise_files()
+Sigs=Signal_Files
+Noises=Noise_Files
 
 #End
 
@@ -334,6 +336,8 @@ Noise_Files=get_noise_files()
 #User Functions
 
 function fast_analysis(set::String)
+DATASTORE=["NAME" "integral" "std_dev" "Peak" "sig to noise"]
+
 	if set=="Noise"||set=="noise"
 		for i=1:length(Noises)
 			SD=read_to_SD(Noises[i])
@@ -349,9 +353,9 @@ function fast_analysis(set::String)
 			sdev=Sigma_Noise(SD.V)
 			println(sdev)
 			
-			plt=plot(SD.t,SD.V, xlabel="Time ($ \mu s$)")
+			plt=plot(SD.t,SD.V, xlabel=L"Time ($ \mu s$)")
 			vline!([0.])
-			ylabel!("Voltage (mV)")
+			ylabel!(L"Voltage (mV)")
 			savefig(plt, get_ID_from_name(Noises[i]))
 			
 			#SPEC=spectral_series(SD.V)
@@ -378,10 +382,11 @@ function fast_analysis(set::String)
 			println("peak:", Peak)
 			println("Sigma:",sdev)
 			
-			plt=plot(SD.t,SD.V, xlabel="Time ($\mu s$)")
+			plt=plot(SD.t,SD.V, xlabel=L"Time ($\mu s$)")
 			vline!([0.])
-			ylabel!("Voltage (mV)")
-			savefig(plt, get_ID_from_name(Sigs[i]))
+			ylabel!(L"Voltage (mV)")
+			gui(plt)
+			#savefig(plt, get_ID_from_name(Sigs[i]))
 			
 			#SPEC=spectral_series(SD.V)
 			#plts=plot(SPEC)
