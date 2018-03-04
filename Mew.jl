@@ -182,7 +182,7 @@ end
 function Gif(ID::String)
 		names=get_directory()
 		names=filter(x -> contains(x, ID), names)
-		anim = @animate for i=1:length(names)
+		anim = @animate for i=1:(length(names)-1)
     		plot1D("gas"*ID*string(i)*".dat")
 		end
 		gif(anim, "ID.gif", fps = 30)
@@ -196,4 +196,18 @@ end
 function Plot_Array(arr::Array{Float64,1})
 		plt=plot(0:(length(arr)-1),arr)
 		gui(plt)
+end
+
+function latexPlot(ID::String, number::Int)
+	#pgplots()
+	files=get_directory()
+	list=filter(x -> contains(x, "gas"*ID*string(number)*"."),files)
+	println(list)
+	#list=filter(x -> contains(x, ID),list)
+	for i=1:length(list)
+			plt=plot1D(list[i])
+			xlabel!(list[i])
+			ylabel!("Y")
+			gui(plt)
+	end
 end
