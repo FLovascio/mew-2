@@ -404,6 +404,18 @@ function fast_analysis(set::String)
 	end
 end
 
+function PlotLaTeX(file::String)
+		SD=read_to_SD(file)
+		SD.t=map(x->1000000*x,SD.t)
+		SD.V=map(x->1000*x,SD.V)
+		ofst=offset(SD)
+		SD.V=map(x->x-ofst, SD.V)	
+		plt=plot(SD.t,SD.V, xlabel=L"Time ($\mu s$)",color=:purple,legend=false, grid=false)
+		vline!([0.],color=:black,linestyle=:dash)
+		ylabel!(L"Voltage \ (mV)")
+end
+
+
 function Write_Analysis()
 	writedlm("ANALS.csv", DATASTORE, ",")
 	writedlm("NANALS.csv", NDATASTORE, ",")
