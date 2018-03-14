@@ -6,6 +6,8 @@ import Plots
 using Plots
 
 #PLOTTING SETUP
+using LaTeXStrings
+pgfplots()
 
 #Itrductory message
 println("
@@ -322,18 +324,24 @@ end
 
 #Globals
 
-DATASTORE=["NAME" "integral" "std_dev" "Peak" "sig to noise"]
-NDATASTORE=["NAME" "integral" "std_dev"]
 Signal_Files=get_sig_files()
 Noise_Files=get_noise_files()
+Sigs=Signal_Files
+Noises=Noise_Files
 
 #End
 
 
 #User Functions
+function rescan()
+		Sigs=get_sig_files()
+		Noises=get_noise_files()
+end
 
 function fast_analysis(set::String)
+
 	if set=="Noise"||set=="noise"
+		NDATASTORE=["NAME" "integral" "std_dev"]	
 		for i=1:length(Noises)
 			SD=read_to_SD(Noises[i])
 			SD.t=map(x->1000000*x,SD.t)
@@ -348,18 +356,20 @@ function fast_analysis(set::String)
 			sdev=Sigma_Noise(SD.V)
 			println(sdev)
 			
-			plt=plot(SD.t,SD.V, xlabel="Time (us)")
+			plt=plot(SD.t,SD.V, xlabel=L"Time ($ \mu s$)")
 			vline!([0.])
-			ylabel!("Voltage (mV)")
+			ylabel!(L"Voltage (mV)")
 			savefig(plt, get_ID_from_name(Noises[i]))
 			
-			SPEC=spectral_series(SD.V)
-			plts=plot(SPEC)
-			savefig(plts, "SPEC_"*get_ID_from_name(Noises[i]))
+			#SPEC=spectral_series(SD.V)
+			#plts=plot(SPEC)
+			#savefig(plts, "SPEC_"*get_ID_from_name(Noises[i]))
 			DATATEMP=[Noises[i] integral sdev]
 			NDATASTORE=vcat(NDATASTORE,DATATEMP)
 		end
+		return NDATASTORE
 	elseif set=="signals"||"Signals"
+		DATASTORE=["NAME" "integral" "std_dev" "Peak" "sig to noise"]
 		for i=1:length(Sigs)
 			SD=read_to_SD(Sigs[i])
 			SD.t=map(x->1000000*x,SD.t)
@@ -377,20 +387,34 @@ function fast_analysis(set::String)
 			println("peak:", Peak)
 			println("Sigma:",sdev)
 			
-			plt=plot(SD.t,SD.V, xlabel="Time (us)")
+			plt=plot(SD.t,SD.V, xlabel=L"Time ($\mu s$)")
 			vline!([0.])
-			ylabel!("Voltage (mV)")
-			savefig(plt, get_ID_from_name(Sigs[i]))
+			ylabel!(L"Voltage (mV)")
+			gui(plt)
+			#savefig(plt, get_ID_from_name(Sigs[i]))
 			
-			SPEC=spectral_series(SD.V)
-			plts=plot(SPEC)
-			savefig(plts, "SPEC_"*get_ID_from_name(Sigs[i]))
+			#SPEC=spectral_series(SD.V)
+			#plts=plot(SPEC)
+			#savefig(plts, "SPEC_"*get_ID_from_name(Sigs[i]))
 			sig_to_noise=Peak/sdev
 			DATATEMP=[Sigs[i] integral sdev Peak sig_to_noise]
 			DATASTORE=vcat(DATASTORE,DATATEMP)
 		end
+		return DATASTORE
 	end
 end
+
+function PlotLaTeX(file::String)
+		SD=read_to_SD(file)
+		SD.t=map(x->1000000*x,SD.t)
+		SD.V=map(x->1000*x,SD.V)
+		ofst=offset(SD)
+		SD.V=map(x->x-ofst, SD.V)	
+		plt=plot(SD.t,SD.V, xlabel=L"Time ($\mu s$)",color=:purple,legend=false, grid=false)
+		vline!([0.],color=:black,linestyle=:dash)
+		ylabel!(L"Voltage \ (mV)")
+end
+
 
 function Write_Analysis()
 	writedlm("ANALS.csv", DATASTORE, ",")
