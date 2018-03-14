@@ -5,7 +5,7 @@ import Base.read
 import Base.eof
 using Plots
 import Plots
-gr()
+#gr()
 #plotly()
 #splash screen
 println("
