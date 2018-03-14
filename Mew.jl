@@ -171,12 +171,12 @@ function Plt(ID::String, number::Int)
 	list=filter(x -> contains(x, "gas"*ID*string(number)*"."),files)
 	println(list)
 	#list=filter(x -> contains(x, ID),list)
-	for i=1:length(list)
-			plt=plot1D(list[i])
-			xlabel!(list[i])
+	#for i=1:length(list)
+			plt=plot1D(list[1])
+			xlabel!(list[1])
 			ylabel!("Y")
-			gui(plt)
-	end
+			return plt
+	#end
 end
 
 function Gif(ID::String)
@@ -199,7 +199,7 @@ function Plot_Array(arr::Array{Float64,1})
 end
 
 function latexPlot(ID::String, number::Int)
-	#pgplots()
+	pgfplots()
 	files=get_directory()
 	list=filter(x -> contains(x, "gas"*ID*string(number)*"."),files)
 	println(list)
