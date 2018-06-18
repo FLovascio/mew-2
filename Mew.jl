@@ -4,6 +4,7 @@ using Base.eof
 import Base.read
 import Base.eof
 using Plots
+using LaTeXStrings
 import Plots
 #gr()
 #plotly()
@@ -57,7 +58,7 @@ function getsize_64(stream::IOStream)
 		end
 		close(stream)
 		return count
-end
+end;
 
 function read(filename::String)
 		f=open(filename,"r")
@@ -68,17 +69,17 @@ function read(filename::String)
 				Dats[i]=read(f,Float64)
 		end
 		return Dats
-end
+end;
 
 function test(readData)
 		println(readData)
-end
+end;
 
 function get_name(file::String)
 		splt=split(file,".")
 		name=splt[1]
 		return name
-end
+end;
 
 function to_mesh(file::String, dimensions::UInt16, mesh_size::Array{Int,1})
 		data=read(file)
@@ -107,7 +108,7 @@ function to_mesh(file::String, dimensions::UInt16, mesh_size::Array{Int,1})
 				end 
 				return mesh
 		end
-end
+end;
 
 function vertical_integration(strucured_data::Array{Float64,3})
 		integrated_data=Array{Float64,2}
@@ -120,7 +121,7 @@ function vertical_integration(strucured_data::Array{Float64,3})
 						integrated_data[i,j]=tmp
 				end
 		end
-end
+end;
 
 function plot1D(file::String)
 		println("reading from "*file)
@@ -129,14 +130,14 @@ function plot1D(file::String)
 		name=get_name(file)
 		Rng=collect(1:length(store))
 		return plot(Rng, store)	
-end
+end;
 
 function get_directory()
 		list=filter(x -> contains(x, ".dat"),readdir())
 		list=filter(x -> contains(x, "gas"),list)
 #		list=filter(x -> contains(x, "00"),list)
 		return list
-end
+end;
 
 function get_outputs(fname::String)
 		f=open(fname)
@@ -144,14 +145,14 @@ function get_outputs(fname::String)
 		Dats=Array{Float64}(length(all))
 		Dats=map(x->parse(Float64,x), all)
 		return Dats
-end
+end;
 
 function peak_find(ID::String, n::Int)
 	list=filter(x->contains(x,".dat"),readdir())
 	list=filter(x -> contains(x, "gas"*ID*string(number)*"."),list)
 	DATA=read(list[1])
   return maximum(DATA)
-end
+end;
 
 function peak_find(ID::String)
 		list=filter(x->contains(x,".dat"),readdir())
@@ -162,7 +163,7 @@ function peak_find(ID::String)
 				vcat(PEAKS,[i,maximum(DATA)])
 		end
 		return PEAKS
-end
+end;
 
 #main
 
@@ -172,12 +173,65 @@ function Plt(ID::String, number::Int)
 	println(list)
 	#list=filter(x -> contains(x, ID),list)
 	#for i=1:length(list)
+	label=L"$V_z$"
+	if ID=="dens"
+		label=L"$\rho$"
+	end
+	if ID=="energy"
+		label=L"$E$"
+	end
+	xlab=L"$Cell Number$"
 			plt=plot1D(list[1])
-			xlabel!(list[1])
-			ylabel!("Y")
+			xlabel!(xlab)
+			ylabel!(label)
 			return plt
 	#end
-end
+end;
+
+function ConcPlt(ID::String, inizio::Int, fine::Int, intervallo::Int)
+	I=inizio
+	files=get_directory()
+	list=filter(x -> contains(x, "gas"*ID*string(I)*"."),files)
+	println(list)
+	#list=filter(x -> contains(x, ID),list)
+	#for i=1:length(list)
+	label=L"$V_z$"
+	if ID=="dens"
+		label=L"$\rho$"
+	end
+	if ID=="energy"
+		label=L"$E$"
+	end
+	xlab=L"$Cell Number$"
+	plt=plot1D(list[1])
+	xlabel!(xlab)
+	ylabel!(label)
+	I=I+intervallo
+
+	while(I<fine)
+		files=get_directory()
+		list=filter(x -> contains(x, "gas"*ID*string(I)*"."),files)
+		println(list)
+		#list=filter(x -> contains(x, ID),list)
+		#for i=1:length(list)
+		label=L"$V_z$"
+		if ID=="dens"
+			label=L"$\rho$"
+		end
+		if ID=="energy"
+			label=L"$E$"
+		end
+		xlab=L"$Cell Number$"
+		println("reading from "*list[1])
+		store=read(list[1])
+		name=get_name(list[1])
+		Rng=collect(1:length(store))
+		plot!(Rng, store)
+		I=I+intervallo
+	end
+	return plt
+	#end
+end;
 
 function Gif(ID::String)
 		names=get_directory()
@@ -186,17 +240,17 @@ function Gif(ID::String)
     		plot1D("gas"*ID*string(i)*".dat")
 		end
 		gif(anim, "ID.gif", fps = 30)
-end
+end;
 
 function Plot_Array(arr::Array{Float64,2})
 		plt=plot(arr[1, ],arr[2, ])
 		gui(plt)
-end
+end;
 
 function Plot_Array(arr::Array{Float64,1})
 		plt=plot(0:(length(arr)-1),arr)
 		gui(plt)
-end
+end;
 
 function latexPlot(ID::String, number::Int)
 	pgfplots()
@@ -204,10 +258,27 @@ function latexPlot(ID::String, number::Int)
 	list=filter(x -> contains(x, "gas"*ID*string(number)*"."),files)
 	println(list)
 	#list=filter(x -> contains(x, ID),list)
+	label=L"$V_z$"
+	if ID=="dens"
+		label=L"$\rho$"
+	end
+	if ID=="energy"
+		label=L"$E$"
+	end
 	for i=1:length(list)
 			plt=plot1D(list[i])
 			xlabel!(list[i])
 			ylabel!("Y")
 			gui(plt)
 	end
-end
+end;
+
+function diffusion_calc(ID::String, position::Int)
+		list=filter(x->contains(x,".dat"),readdir())
+		list=filter(x->contains(x,"gas"*ID),list)
+		DATA=read(list[1])
+		for i=2:length(list)
+			DATA=hcat(DATA,read(list[i]))
+		end
+		Point=DATA[position]
+
