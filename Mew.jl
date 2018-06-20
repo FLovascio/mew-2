@@ -281,4 +281,10 @@ function diffusion_calc(ID::String, position::Int)
 			DATA=hcat(DATA,read(list[i]))
 		end
 		Point=DATA[position]
+		for i=2:length(DATA)
+			Point=hcat(DATA[position])
+		end
+	return Point
+end
+
 
