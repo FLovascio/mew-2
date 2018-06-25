@@ -15,16 +15,31 @@ F_P1(Omeg::Complex, P0::Real)=((im*P0)/(im*Omeg+((Cs^2)*ts*k*((1-Rho0)/((Cs^2)*R
 F_P0()=(Cs^2)*(1-fd)*(Rho0)
 F_V1(Omeg::Complex, P1::Complex)=(k/(Rho0*Omeg))*P1
 
-OMEGA=F_Omeg;
+OMEGA=F_Omeg();
 
 #TIME PROGRESSION
-P_t(P0,t,x)=P0*e^(im*(OMEGA*t+k*x))
-function newP0(P0,t,x)
+P_t(P0,P1,t,x)=P0+P1*e^(im*(OMEGA*t+k*x))
+function newP(P0,P1,t,x)
+	NewP=deepcopy(P0)
+	#for i=1:size(P0)
+		NewP=P_t(P0,P1,t,x)
+	#end
+	return NewP
+end
+
+#=function newP0(P0,t,x)
 	NewP=deepcopy(P0)
 	for i=1:size(P0)
 		NewP[i]=P_t(P0[i],t,x)
 	end
 	return NewP
 end
+=#
 
+#=function make_init(step_number)
+	p0=F_P0()
+	F_P1=F_P1(OMEGA,p0)
+	step_size= 
+	for i=1:step_number
+=#
 
