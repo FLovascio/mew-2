@@ -45,6 +45,12 @@ println("
                                                                            ")
 
 #type
+type parameters
+	Geometry::String #Cartesian, Cylindrical, Spherical
+	Dimensions::Array{Bool} #x,y,z true or false
+	Domains::Array{Tuple{Float64}} #Domains for each coordinate
+	Dt::Float64 #timestep
+end
 
 #plot themes
 
@@ -71,6 +77,9 @@ function read(filename::String)
 		end
 		return Dats
 end;
+
+function readParam()
+end
 
 function test(readData)
 		println(readData)
