@@ -6,6 +6,7 @@ import Base.eof
 using Plots
 using LaTeXStrings
 import Plots
+include("Diffusion.jl")
 #gr()
 plotlyjs()
 #splash screen
