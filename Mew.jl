@@ -55,6 +55,32 @@ end
 #plot themes
 
 #functions
+function readPar()
+	f=open("variables.par")
+	Lines=readlines(f)
+	PAR::Array{Array{String}}
+	#Par::parameters
+	#=for S in lines
+		tmp=split(S)
+		PAR=hcat(PAR,tmp)
+	end=#
+	return Lines
+end
+
+function makeDimensions()
+	Par=readPar()
+	NX=filter(x->contains(x,"NX"),Par)
+	xDomain=convert(split(NX)[2],UInt16)
+	NY=filter(x->contains(x,"NY"),Par)
+	yDomain=convert(split(NY)[2],UInt16)
+	NZ=filter(x->contains(x,"NZ"),Par)
+	zDomain=convert(split(NZ)[2],UInt16)
+	grid=[xDomain,yDomain,zDomain]
+	return grid
+end
+
+DIMENSIONS = makeDimensions()
+
 function getsize_64(stream::IOStream)
 		count =0
 		while !eof(stream)
@@ -79,7 +105,7 @@ function read(filename::String)
 end;
 
 function readParam()
-end
+end;
 
 function test(readData)
 		println(readData)
@@ -91,8 +117,38 @@ function get_name(file::String)
 		return name
 end;
 
-function to_mesh(file::String, dimensions::UInt16, mesh_size::Array{Int,1})
+function to_mesh(file::String)
 		data=read(file)
+		dimensions=0
+		X=false
+		Y=false
+		Z=false
+		mesh_size=0
+		if DIMENSIONS[1]>1
+			dimensions+=1
+			mesh_size=DIMENSIONS[1]
+			X=true
+		end
+		if DIMENSIONS[2]>1
+			if dimensions==1
+				mesh_size=vcat(mesh_size,DIMENSIONS[2])
+			else
+				mesh_size=DIMENSIONS[2]
+			end
+			dimensions+=1
+			Y=true
+		end
+		if DIMENSIONS[3]>1
+			if dimensions>1
+				mesh_size=vcat(mesh_size,DIMENSIONS[3])
+			else
+				mesh_size=DIMENSIONS[3]
+			end
+			dimensions+=1
+			Z=true
+		end
+
+
 		if dimensions==1
 			mesh=Array{Float64}(mesh_size[1])
 				mesh=data
@@ -100,19 +156,19 @@ function to_mesh(file::String, dimensions::UInt16, mesh_size::Array{Int,1})
 		end
 		if dimensions==2
 			mesh=Array{Float64}(mesh_size[1], mesh_size[2])
-				for i=1:mesh_size[1]
-						for j=1:mesh_size[2]
-								mesh[i,j]=data[i*j]
+				for j=1:mesh_size[2]
+						for i=1:mesh_size[1]
+							mesh[i,j]=data[i+j*mesh_size[1]]
 						end
 				end
 				return mesh
 		end
 		if dimensions==3
 			mesh=Array{Float64}(mesh_size[1], mesh_size[2], mesh_size[3])
-				for i=1:mesh_size[1]
+				for k=1:mesh_size[3]
 						for j=1:mesh_size[2]
-								for k=1:mesh_size[3]
-										mesh[i,j,k]=data[i*j*k]
+								for i=1:mesh_size[1]
+									mesh[i,j,k]=data[i+j*mesh_size[1]+k*mesh_size[1]*mesh_size[2]]
 								end
 						end
 				end 
@@ -191,12 +247,21 @@ function Plt(ID::String, number::Int)
 		label=L"$E$"
 	end
 	xlab=L"$Cell Number$"
-			plt=plot1D(list[1])
-			xlabel!(xlab)
-			ylabel!(label)
-			return plt
-	#end
+	plt=plot1D(list[1])
+	xlabel!(xlab)
+	ylabel!(label)
+	return plt
 end;
+
+function GenericPlot(ID::String, number::Int)
+	files=get_directory()
+	list=filter(x -> contains(x, "gas"*ID*string(number)*"."),files)
+	println(list)
+	mesh=to_mesh(list)
+	plt=plot(mesh,seriestype = :surface)
+	return plt
+end
+
 
 function ConcPlt(ID::String, inizio::Int, fine::Int, intervallo::Int)
 	I=inizio
