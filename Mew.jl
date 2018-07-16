@@ -79,7 +79,7 @@ function makeDimensions()
 	return grid
 end
 
-DIMENSIONS = makeDimensions()
+#DIMENSIONS = makeDimensions()
 
 function getsize_64(stream::IOStream)
 		count =0
