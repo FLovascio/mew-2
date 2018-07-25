@@ -10,7 +10,8 @@ include("Diffusion.jl")
 #gr()
 plotlyjs()
 #splash screen
-println("
+if(!NOSPLASH)
+	println("
                               ##Welcome to µ-2##                                                                  
               ,,,,,,,,.                                  ,*/,.                 
               ./&@@@@@@&*,,                             ./&@@%**.              
@@ -44,6 +45,7 @@ println("
                                                                                
                                                                            ")
 
+end
 #type
 type parameters
 	Geometry::String #Cartesian, Cylindrical, Spherical
