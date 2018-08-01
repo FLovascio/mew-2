@@ -8,7 +8,7 @@ using LaTeXStrings
 import Plots
 include("Diffusion.jl")
 #gr()
-plotlyjs()
+plotly()
 #splash screen
 if(!NOSPLASH)
 	println("
