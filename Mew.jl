@@ -1,14 +1,16 @@
 #includes
-using Base.read
-using Base.eof
+#using Base.read
+#using Base.eof
 import Base.read
 import Base.eof
+using DelimitedFiles
 using Plots
 using LaTeXStrings
 import Plots
 include("Diffusion.jl")
 #gr()
 plotly()
+NOSPLASH=false
 #splash screen
 if(!NOSPLASH)
 	println("
@@ -47,13 +49,13 @@ if(!NOSPLASH)
 
 end
 #type
-type parameters
+#=type parameters
 	Geometry::String #Cartesian, Cylindrical, Spherical
 	Dimensions::Array{Bool} #x,y,z true or false
 	Domains::Array{Tuple{Float64}} #Domains for each coordinate
 	Dt::Float64 #timestep
 end
-
+=#
 #plot themes
 
 #functions
@@ -71,11 +73,11 @@ end
 
 function makeDimensions()
 	Par=readPar()
-	NX=filter(x->contains(x,"NX"),Par)
+	NX=filter(x->occursin(x,"NX"),Par)
 	xDomain=convert(split(NX)[2],UInt16)
-	NY=filter(x->contains(x,"NY"),Par)
+	NY=filter(x->occursin(x,"NY"),Par)
 	yDomain=convert(split(NY)[2],UInt16)
-	NZ=filter(x->contains(x,"NZ"),Par)
+	NZ=filter(x->occursin(x,"NZ"),Par)
 	zDomain=convert(split(NZ)[2],UInt16)
 	grid=[xDomain,yDomain,zDomain]
 	return grid
@@ -99,7 +101,7 @@ function read(filename::String)
 		f=open(filename,"r")
 		f_size=getsize_64(f)
 		f=open(filename,"r")
-		Dats=Array{Float64}(f_size)
+		Dats=zeros(Float64,f_size)
 		for i= 1:f_size
 				Dats[i]=read(f,Float64)
 		end
@@ -201,9 +203,9 @@ function plot1D(file::String)
 end;
 
 function get_directory()
-		list=filter(x -> contains(x, ".dat"),readdir())
-		list=filter(x -> contains(x, "gas"),list)
-#		list=filter(x -> contains(x, "00"),list)
+		list=filter(x -> occursin(".dat",x),readdir())
+		list=filter(x -> occursin("gas",x),list)
+#		list=filter(x -> occursin(x, "00"),list)
 		return list
 end;
 
@@ -216,15 +218,15 @@ function get_outputs(fname::String)
 end;
 
 function peak_find(ID::String, n::Int)
-	list=filter(x->contains(x,".dat"),readdir())
-	list=filter(x -> contains(x, "gas"*ID*string(number)*"."),list)
+	list=filter(x->occursin(".dat",x),readdir())
+	list=filter(x -> occursin("gas"*ID*string(number)*".",x),list)
 	DATA=read(list[1])
   return maximum(DATA)
 end;
 
 function peak_find(ID::String)
-		list=filter(x->contains(x,".dat"),readdir())
-		list=filter(x->contains(x,"gas"*ID),list)
+		list=filter(x->occursin(".dat",x),readdir())
+		list=filter(x->occursin("gas"*ID,x),list)
 		PEAKS=Array{Float64,2}
 		for i=0:(length(list)-1)
 				DATA=read("gas"*ID*string(i)*".dat")
@@ -237,9 +239,9 @@ end;
 
 function Plt(ID::String, number::Int)
 	files=get_directory()
-	list=filter(x -> contains(x, "gas"*ID*string(number)*"."),files)
+	list=filter(x -> occursin("gas"*ID*string(number)*".",x),files)
 	println(list)
-	#list=filter(x -> contains(x, ID),list)
+	#list=filter(x -> occursin(x, ID),list)
 	#for i=1:length(list)
 	label=L"$V_z$"
 	if ID=="dens"
@@ -257,7 +259,7 @@ end;
 
 function GenericPlot(ID::String, number::Int)
 	files=get_directory()
-	list=filter(x -> contains(x, "gas"*ID*string(number)*"."),files)
+	list=filter(x -> occursin("gas"*ID*string(number)*".",x),files)
 	println(list)
 	mesh=to_mesh(list)
 	plt=plot(mesh,seriestype = :surface)
@@ -268,9 +270,9 @@ end
 function ConcPlt(ID::String, inizio::Int, fine::Int, intervallo::Int)
 	I=inizio
 	files=get_directory()
-	list=filter(x -> contains(x, "gas"*ID*string(I)*"."),files)
+	list=filter(x -> occursin("gas"*ID*string(I)*".",x),files)
 	println(list)
-	#list=filter(x -> contains(x, ID),list)
+	#list=filter(x -> occursin(x, ID),list)
 	#for i=1:length(list)
 	label=L"$V_z$"
 	if ID=="dens"
@@ -287,9 +289,9 @@ function ConcPlt(ID::String, inizio::Int, fine::Int, intervallo::Int)
 
 	while(I<fine)
 		files=get_directory()
-		list=filter(x -> contains(x, "gas"*ID*string(I)*"."),files)
+		list=filter(x -> occursin("gas"*ID*string(I)*".",x),files)
 		println(list)
-		#list=filter(x -> contains(x, ID),list)
+		#list=filter(x -> occursin(x, ID),list)
 		#for i=1:length(list)
 		label=L"$V_z$"
 		if ID=="dens"
@@ -312,7 +314,7 @@ end;
 
 function Gif(ID::String)
 		names=get_directory()
-		names=filter(x -> contains(x, ID), names)
+		names=filter(x -> occursin(ID,x), names)
 		anim = @animate for i=1:(length(names)-1)
     		plot1D("gas"*ID*string(i)*".dat")
 		end
@@ -332,9 +334,9 @@ end;
 function latexPlot(ID::String, number::Int)
 	pgfplots()
 	files=get_directory()
-	list=filter(x -> contains(x, "gas"*ID*string(number)*"."),files)
+	list=filter(x -> occursin("gas"*ID*string(number)*".",x),files)
 	println(list)
-	#list=filter(x -> contains(x, ID),list)
+	#list=filter(x -> occursin(x, ID),list)
 	label=L"$V_z$"
 	if ID=="dens"
 		label=L"$\rho$"
@@ -351,8 +353,8 @@ function latexPlot(ID::String, number::Int)
 end;
 
 function diffusion_calc(ID::String, position::Int)
-		list=filter(x->contains(x,".dat"),readdir())
-		list=filter(x->contains(x,"gas"*ID),list)
+		list=filter(x->occursin(".dat",x),readdir())
+		list=filter(x->occursin("gas"*ID,x),list)
 		#println(list)
 		DATA=read("gas"*ID*string(0)*".dat")
 		Point=DATA[position]

@@ -15,5 +15,5 @@ function LN(data::Array{Float64},theoretical::Array{Float64},N::Float64)
 	for i=1:length(data)
 		L=L+abs(data[i]^N -theoretical[i]^N)
 	end
-	L=(1./convert(Float64,length(data)))*L
+	L=(1.0/convert(Float64,length(data)))*L
 end
