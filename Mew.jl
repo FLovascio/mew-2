@@ -10,7 +10,7 @@ import Plots
 include("Diffusion.jl")
 #gr()
 plotly()
-NOSPLASH=false
+NOSPLASH=true
 #splash screen
 if(!NOSPLASH)
 	println("
@@ -365,5 +365,13 @@ function diffusion_calc(ID::String, position::Int)
 		end
 	return Point
 end;
+
+function Simpson(ID::String, time::Int);
+	files=get_directory();
+	list=filter(x -> occursin("gas"*ID*string(time)*".",x),files);
+	println("reading from "*list[1]);
+	DATA=read(list[1]);
+	Rng=collect(1:length(DATA));
+end
 
 println("Loaded!")
