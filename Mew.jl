@@ -366,7 +366,7 @@ function diffusion_calc(ID::String, position::Int)
 	return Point
 end;
 
-function integrate_simpson(f::Array{Float64,1},h::Float64)
+function integrate_simpson_old(f::Array{Float64,1},h::Float64)
     sum_odd=0.0
     sum_even=0.0
     for i=2:convert(Int64,floor((length(f)-1)/2))
@@ -377,6 +377,10 @@ function integrate_simpson(f::Array{Float64,1},h::Float64)
     return integral
 end
 
+integrate_simpson(f::Array{Float64,1},h::Float64) = 0.3333333333*h*(f[1]+4.0*sum(f[3:2:end-1])+2.0*sum(f[2:2:end-1])+f[end])
+
+integrate_trap(f::Array{Float64,1},h::Float64) = 0.5*h*(f[1]+2.0*sum(f[2:end-1])+f[end])
+	
 function Simpson(ID::String, time::Int, h::Float64);
 	files=get_directory();
 	list=filter(x -> occursin("gas"*ID*string(time)*".",x),files);
@@ -385,6 +389,15 @@ function Simpson(ID::String, time::Int, h::Float64);
 	integral=integrate_simpson(DATA,h)
 	return integral;
 end;
+
+function Integrate(ID::String, time::Int, h::Float64, method::Function);
+	files=get_directory();
+	list=filter(x -> occursin("gas"*ID*string(time)*".",x),files);
+	println("reading from "*list[1]);
+	DATA=read(list[1]);
+	integral=method(DATA,h)
+	return integral;
+end
 
 ρd(ρ,P,cs2)=(ρ - P/cs2)
 
@@ -396,12 +409,28 @@ function MdArray(ρ,P,cs2)
 	return ρD
 end
 
+function dustMass(time::Int, cs2::Float64, h::Float64,method::Function)
+	P=read("gasenergy"*string(time)*".dat");
+	ρ=read("gasdens"*string(time)*".dat");
+	md=MdArray(ρ,P,cs2)
+	integral=method(md,h)
+	return integral
+end
+
 function dustMass(time::Int, cs2::Float64, h::Float64)
 	P=read("gasenergy"*string(time)*".dat");
 	ρ=read("gasdens"*string(time)*".dat");
 	md=MdArray(ρ,P,cs2)
 	integral=integrate_simpson(md,h)
 	return integral
+end
+
+function dust_mass_t(beg::Int, en::Int, cs2::Float64, h::Float64, method::Function)
+	Masses=dustMass(beg,cs2,h,method)
+	for i=beg+1:en
+		Masses=vcat(Masses,dustMass(i,cs2,h,method))
+	end
+	return Masses
 end
 
 function dust_mass_t(beg::Int, en::Int, cs2::Float64, h::Float64)
