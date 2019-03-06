@@ -1,10 +1,10 @@
-include("/.astro/users2/lovascio/src/fargo3d-1.2/WaveCalc.jl")
+include("/.astro/users2/lovascio/src/DUSTY/setups/dustyWave/WaveCalc.jl")
 
 function makeWave(t::Float64, init::Array{Float64})
 	wave=deepcopy(init)
-	h=L/length(init)
+	h=L/(length(init)+1)
 	for i=1:length(init)
-		x=h*i
+		x=h*i+0.5*h
 		wave[i]=real(P0-abs(P1)*exp(im*(Omeg*t+k*x+angle(P1))))
 	end
 	return wave
