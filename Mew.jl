@@ -1,6 +1,11 @@
 #includes
 #using Base.read
 #using Base.eof
+#include("PorusMedium.jl")
+push!(LOAD_PATH, "/astro/lovascio/src/Data_Analysis/Mew-2/")
+#include("FARGOread.jl")
+using	PorusMedium
+using fargoRead
 import Base.read
 import Base.eof
 using DelimitedFiles
@@ -8,46 +13,8 @@ using Plots
 using LaTeXStrings
 import Plots
 include("Diffusion.jl")
-#gr()
-plotly()
-NOSPLASH=true
-#splash screen
-if(!NOSPLASH)
-	println("
-					##Welcome to µ-2##                                                                  
-					,,,,,,,,.                                  ,*/,.                 
-					./&@@@@@@&*,,                             ./&@@%**.              
-					./@@@@@@@@(*                            /#@@@@@(,             
-					*%&@@@@@@(. ..,,,,,,***,,,,,,.       ,/@@@@@@@.             
-					.#%&@@@@@@,,(&@@@@@@@@@@@@@@@%/,,,. ,*@@@@@&&&/             
-					.(%%&@@@@@#,@@@@@@@@@@@@@@@@@@@@@@(,*&@@@@&&%%#             
-					,#&@@@@@@@@(/@@@@@@@@@@@@@@@@@@@@@@@&,(@@&&%%%/             
-					/&@@@@@@@@@@/*@@@@@@@@@@@@@@@@@@@@@@@@@/,%%%%%.             
-					.//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@&.#%%%              
-					.*(@@@@@@@@@@&&&&&&&&&&&&&&@@@@@@@@@@@&&&&%%( #%(              
-					**&@@@@@@@@@&&&&&&&&&&&&&&&&&,&&&&&&&&&&&&&%%%# /               
-					*/@@@@@@@@@@&&&&&&&&&&&&&&&&&&&,(&&&&&&&&&&&%%%%#                
-					*/@@@@@@@@@@&&&&%#,,%&&&&&&&&&&&&%,&&&&&&&&&&%%%%%(               
-					*/@@@@@@@@@@&&&&&%%%,%*,#&&&&&&&&&&&.%&&&&&&&&&%%%%%,              
-					,/&@@@@@@@@@&&&&&&%%/#@@*,*.(&&&&&&&&&,&&&&&&&&&&&%%%%              
-					*(@@@@@@@&&&&&&&&%%%,....***/@#,&&&&&&&,#&&&&&&&&&&&%%#             
-					..#%&&&@@&&&&&&&&&%%%,....***%@@@.&&&&&&&*(&&&&&&&&%%%%#(            
-					(#####%&&&&&&&&&*(%/...,**.@@@@&(&&&&%%%.&&&&&%%%######            
-					,(((((#%&&&&&&&&&&(..****.&@@@@@.&%%%%%%.&&&%%%%######             
-					.((((((%%&&&&&&&&&&&%,.*@@@@@@@(/%%%%%/*&&%%%######(              
-					/((((((%%&&&&&&&&&&&&&&/,#@@@@,#%%%,#&&%%%#####(                
-					.((((((#%&&&&&&&&&&&&&&&&%*.##*%%%&&&&%%##..#.                 
-					/((((((#%&&&&&&&&&&&&&&&&&&&&%#/#&&&%%##,                    
-					*(((((((#%%&&&&&&&&&&&&&&&&&&&&&&&%%###(                    
-					.((((((((#%%%&&&&&&&&&&&&&&&&&&&&%%####*                   
-					/((((((((#%%%%%%&&&&&&&&&%%%%%%######*                  
-					*((((((((((##%%%%%%%%%%%%##.###**##.                  
-					*(((((((((((((/ .*(########/(.                    
-					.,/(((((((((((((* .(*.                        
 
-					")
-
-end
+gr()
 #type
 #=type parameters
 Geometry::String #Cartesian, Cylindrical, Spherical
@@ -59,67 +26,7 @@ end
 #plot themes
 
 #functions
-function readPar()
-	f=open("variables.par")
-	Lines=readlines(f)
-	PAR::Array{Array{String}}
-	#Par::parameters
-	#=for S in lines
-	tmp=split(S)
-	PAR=hcat(PAR,tmp)
-	end=#
-	return Lines
-end
 
-function makeDimensions()
-	Par=readPar()
-	NX=filter(x->occursin(x,"NX"),Par)
-	xDomain=convert(split(NX)[2],UInt16)
-	NY=filter(x->occursin(x,"NY"),Par)
-	yDomain=convert(split(NY)[2],UInt16)
-	NZ=filter(x->occursin(x,"NZ"),Par)
-	zDomain=convert(split(NZ)[2],UInt16)
-	grid=[xDomain,yDomain,zDomain]
-	return grid
-end
-
-#DIMENSIONS = makeDimensions()
-
-function getsize_64(stream::IOStream)
-	count =0
-	while !eof(stream)
-		#println(eof(stream))
-		read(stream, Float64)
-		count+=1
-		#println(count)
-	end
-	close(stream)
-	return count
-end;
-
-function read(filename::String)
-	f=open(filename,"r")
-	f_size=getsize_64(f)
-	f=open(filename,"r")
-	Dats=zeros(Float64,f_size)
-	for i= 1:f_size
-		Dats[i]=read(f,Float64)
-	end
-	return Dats
-end;
-
-function readParam()
-end;
-
-function test(readData)
-	println(readData)
-end;
-
-function get_name(file::String)
-	splt=split(file,".")
-	name=splt[1]
-	return name
-end;
 
 function to_mesh(file::String)
 	data=read(file)
@@ -482,14 +389,50 @@ blSol(x,t)=map(a->Barenblatt_like(a,t),x)
 
 function Converge(time::Float64)
 	list=filter(x->occursin(".dat",x),readdir());
+	list=filter!(x->occursin("gas",x),list);
+	errors=zeros(2,length(list))
+	len=zeros(length(list))
+	for (i,file) ∈ enumerate(list)
+		data=read(file)
+		errors[1,i]=parse(Float64,split(split(file,"gasenergy")[2],".")[1]) 
+		errors[2,i]=L1(makeWave(time,data),data)
+	end
+	return(errors)
+end
+
+function testInit()
+	list=filter(x->occursin(".dat",x),readdir());
+	list=filter!(x->occursin("gas",x),list);
 	errors=zeros(length(list))
 	len=zeros(length(list))
-	for (file,i) ∈ zip(list,collect(1:length(list)))
+	for (i,file) ∈ enumerate(list)
 		data=read(file)
-		errors[i]=L1(makeWave(10.0,data),data)
+		errors[i]=L1(makeWaveInit(data)[2],data)
 		len[i]=parse(Float64,split(split(file,"gasenergy")[2],".")[1]) 
 	end
 	return(len,errors)
 end
 
+function makex(data,range)
+	(xmin,xmax)=range
+	h=(xmax-xmin)/length(data)
+	x=collect(xmin:h:xmax-h)
+	x=x.+(0.5*h)
+	return x
+end
+
+function Difusion_Convergence(time::Float64)
+	list=filter(x->occursin(".dat",x),readdir());
+	list=filter!(x->occursin("gas",x),list);
+	errors=zeros(2,length(list))
+	len=zeros(length(list))
+	for (i,file) ∈ enumerate(list)
+		data=fargo_read(file)
+		x=makex(data,(-5.0,5.0))
+		errors[1,i]=parse(Float64,split(split(file,"gasenergy")[2],".")[1]) 
+		errors[2,i]=L1(AnalyticSolution(x,time),(1.0.-data))
+	end
+	return(errors)
+
+end
 println("Loaded!")
