@@ -14,7 +14,7 @@ using LaTeXStrings
 import Plots
 include("Diffusion.jl")
 
-gr()
+pyplot()
 #type
 #=type parameters
 Geometry::String #Cartesian, Cylindrical, Spherical
@@ -103,7 +103,7 @@ end;
 function plot1D(file::String)
 	println("reading from "*file)
 	plotname="tst"
-	store=read(file)
+	store=fargo_read(file)
 	name=get_name(file)
 	Rng=collect(1:length(store))
 	return plot(Rng, store)	
@@ -209,7 +209,7 @@ function ConcPlt(ID::String, inizio::Int, fine::Int, intervallo::Int)
 		end
 		xlab=L"$Cell Number$"
 		println("reading from "*list[1])
-		store=read(list[1])
+		store=fargo_read(list[1])
 		name=get_name(list[1])
 		Rng=collect(1:length(store))
 		plot!(Rng, store)
@@ -263,11 +263,11 @@ function diffusion_calc(ID::String, position::Int)
 	list=filter(x->occursin(".dat",x),readdir())
 	list=filter(x->occursin("gas"*ID,x),list)
 	#println(list)
-	DATA=read("gas"*ID*string(0)*".dat")
+	DATA=fargo_read("gas"*ID*string(0)*".dat")
 	Point=DATA[position]
 	#println(length(list))
 	for i=1:length(list)-1
-		DATA=read("gas"*ID*string(i)*".dat")
+		DATA=fargo_read("gas"*ID*string(i)*".dat")
 		Point=vcat(Point,DATA[position])
 	end
 	return Point
@@ -292,7 +292,7 @@ function Simpson(ID::String, time::Int, h::Float64);
 	files=get_directory();
 	list=filter(x -> occursin("gas"*ID*string(time)*".",x),files);
 	println("reading from "*list[1]);
-	DATA=read(list[1]);
+	DATA=fargo_read(list[1]);
 	integral=integrate_simpson(DATA,h)
 	return integral;
 end;
@@ -301,12 +301,12 @@ function Integrate(ID::String, time::Int, h::Float64, method::Function);
 	files=get_directory();
 	list=filter(x -> occursin("gas"*ID*string(time)*".",x),files);
 	println("reading from "*list[1]);
-	DATA=read(list[1]);
+	DATA=fargo_read(list[1]);
 	integral=method(DATA,h)
 	return integral;
 end
 
-ρd(ρ,P,cs2)=(ρ - P/cs2)
+ρd(ρ::Float64,P::Float64,cs2::Float64)=(ρ - P/cs2)
 Fd(ρ,P,cs2)=(1.0 - P/(ρ*cs2))
 
 function MdArray(ρ,P,cs2)
@@ -326,16 +326,16 @@ function FdArray(ρ,P,cs2)
 end
 
 function dustMass(time::Int, cs2::Float64, h::Float64,method::Function)
-	P=read("gasenergy"*string(time)*".dat");
-	ρ=read("gasdens"*string(time)*".dat");
+	P=fargo_read("gasenergy"*string(time)*".dat");
+	ρ=fargo_read("gasdens"*string(time)*".dat");
 	md=MdArray(ρ,P,cs2)
 	integral=method(md,h)
 	return integral
 end
 
 function dustMass(time::Int, cs2::Float64, h::Float64)
-	P=read("gasenergy"*string(time)*".dat");
-	ρ=read("gasdens"*string(time)*".dat");
+	P=fargo_read("gasenergy"*string(time)*".dat");
+	ρ=fargo_read("gasdens"*string(time)*".dat");
 	md=MdArray(ρ,P,cs2)
 	integral=integrate_simpson(md,h)
 	return integral
@@ -358,24 +358,24 @@ function dust_mass_t(beg::Int, en::Int, cs2::Float64, h::Float64)
 end
 
 function Plot_fd(time::Array{Int,1}, cs2::Float64,h::Float64)
-	P=read("gasenergy"*string(time[1])*".dat");
-	ρ=read("gasdens"*string(time[1])*".dat");
-	md=MdArray(ρ,P,cs2)
+	P=fargo_read("gasenergy"*string(time[1])*".dat");
+	ρ=fargo_read("gasdens"*string(time[1])*".dat");
+	fd=FdArray(ρ,P,cs2)
 	x=map(x->x*h,range(-floor(length(P))/2,length(P)/2-1))
 	println(length(x))
-	pl= plot(x,md)
+	pl= plot(x,fd)
 	for i = 2:length(time)
-		P=read("gasenergy"*string(time[i])*".dat");
-		ρ=read("gasdens"*string(time[i])*".dat");
-		md=MdArray(ρ,P,cs2)
-		plot!(x,md)
+		P=fargo_read("gasenergy"*string(time[i])*".dat");
+		ρ=fargo_read("gasdens"*string(time[i])*".dat");
+		fd=FdArray(ρ,P,cs2)
+		plot!(x,fd)
 	end
 	gui(pl)
 end
 
 function fd_read(time::Int, cs2::Float64)
-	P=read("gasenergy"*string(time)*".dat");
-	ρ=read("gasdens"*string(time)*".dat");
+	P=fargo_read("gasenergy"*string(time)*".dat");
+	ρ=fargo_read("gasdens"*string(time)*".dat");
 	return FdArray(ρ,P,cs2)
 end
 

@@ -1,6 +1,6 @@
 module fargoRead
 
-export makeDimensions, getsize_64, get_name, fargo_read
+export makeDimensions, getsize_64, get_name, fargo_read, makeMesh
 
 function readPar()
 	f=open("variables.par")
@@ -26,7 +26,15 @@ function makeDimensions()
 	return grid
 end
 
-#DIMENSIONS = makeDimensions()
+function makeMesh()
+	fx=open("domain_x.dat")
+	xmesh=map(x->parse(Float64,x),readlines(fx))
+	fy=open("domain_y.dat")
+	ymesh=map(x->parse(Float64,x),readlines(fy))
+	fz=open("domain_z.dat")
+	zmesh=map(x->parse(Float64,x),readlines(fz))
+	return Dict("x"=>xmesh,"y"=>ymesh,"z"=>zmesh)
+end
 
 function getsize_64(stream::IOStream)
 	count =0
