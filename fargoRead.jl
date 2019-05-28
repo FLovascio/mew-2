@@ -26,14 +26,14 @@ function makeDimensions()
 	return grid
 end
 
-function makeMesh()
+function makeMesh(NGHY::Int64=3,NGHZ::Int64=3)
 	fx=open("domain_x.dat")
 	xmesh=map(x->parse(Float64,x),readlines(fx))
 	fy=open("domain_y.dat")
 	ymesh=map(x->parse(Float64,x),readlines(fy))
 	fz=open("domain_z.dat")
 	zmesh=map(x->parse(Float64,x),readlines(fz))
-	return Dict("x"=>xmesh,"y"=>ymesh,"z"=>zmesh)
+	return Dict("x"=>xmesh,"y"=>ymesh[1+NGHY:end-NGHY],"z"=>zmesh[1+NGHZ:end-NGHZ])
 end
 
 function getsize_64(stream::IOStream)
@@ -58,6 +58,9 @@ function fargo_read(filename::String)
 	end
 	return Dats
 end;
+
+function toMesh()
+end
 
 function readParam()
 end;
