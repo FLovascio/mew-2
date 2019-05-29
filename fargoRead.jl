@@ -1,6 +1,6 @@
 module fargoRead
 
-export makeDimensions, getsize_64, get_name, fargo_read, makeMesh
+export makeDimensions, getsize_64, get_name, fargo_read, makeMesh, toMesh
 
 function readPar()
 	f=open("variables.par")
@@ -33,7 +33,7 @@ function makeMesh(NGHY::Int64=3,NGHZ::Int64=3)
 	ymesh=map(x->parse(Float64,x),readlines(fy))
 	fz=open("domain_z.dat")
 	zmesh=map(x->parse(Float64,x),readlines(fz))
-	return Dict("x"=>xmesh,"y"=>ymesh[1+NGHY:end-NGHY],"z"=>zmesh[1+NGHZ:end-NGHZ])
+	return Dict("x"=>xmesh[1:end-1],"y"=>ymesh[1+NGHY:end-(NGHY+1)],"z"=>zmesh[1+NGHZ:end-(1+NGHZ)])
 end
 
 function getsize_64(stream::IOStream)
@@ -59,7 +59,53 @@ function fargo_read(filename::String)
 	return Dats
 end;
 
-function toMesh()
+function toCentered(mesh::Dict{String,Array{Float64,1}})
+	if length(mesh["x"])>1
+		xoffset=0.5*(mesh["x"][2]-mesh["x"][1])
+	else
+		xoffset=0.0
+	end
+	if length(mesh["x"])>1
+		yoffset=0.5*(mesh["y"][2]-mesh["y"][1])
+	else
+		yoffset=0.
+	end
+	if length(mesh["x"])>1
+		zoffset=0.5*(mesh["z"][2]-mesh["z"][1])
+	else
+		zoffset=0.
+	end
+	xticks=mesh["x"][1:end-1]
+	yticks=mesh["y"][1:end-1]
+	zticks=mesh["z"][1:end-1]
+	xticks=xticks.+xoffset
+	yticks=yticks.+yoffset
+	zticks=zticks.+zoffset
+	return Dict("x"=>xticks,"y"=>yticks,"z"=>zticks)
+end
+
+function toMesh(data::Array{Float64}, mesh::Dict{String,Array{Float64,1}}, centering::Bool)
+	if centering
+		newmesh=toCentered(mesh)
+		xlength=length(newmesh["x"])
+		ylength=length(newmesh["y"])
+		zlength=length(newmesh["z"])
+	else
+		xlength=length(mesh["x"])
+		ylength=length(mesh["y"])
+		zlength=length(mesh["z"])
+	end
+	DataNew=zeros(Float64,xlength,ylength,zlength)
+	counter=1
+	for i=1:xlength
+		for j=1:ylength
+			for k=1:zlength
+				DataNew[i,j,k]=data[counter]
+				counter+=1
+			end
+		end
+	end
+	return DataNew
 end
 
 function readParam()
