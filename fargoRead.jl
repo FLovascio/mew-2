@@ -75,9 +75,9 @@ function toCentered(mesh::Dict{String,Array{Float64,1}})
 	else
 		zoffset=0.
 	end
-	xticks=mesh["x"][1:end-1]
-	yticks=mesh["y"][1:end-1]
-	zticks=mesh["z"][1:end-1]
+	xticks=mesh["x"][1:end]
+	yticks=mesh["y"][1:end]
+	zticks=mesh["z"][1:end]
 	xticks=xticks.+xoffset
 	yticks=yticks.+yoffset
 	zticks=zticks.+zoffset
@@ -97,10 +97,10 @@ function toMesh(data::Array{Float64}, mesh::Dict{String,Array{Float64,1}}, cente
 	end
 	DataNew=zeros(Float64,xlength,ylength,zlength)
 	counter=1
-	for i=1:xlength
+	for i=1:zlength
 		for j=1:ylength
-			for k=1:zlength
-				DataNew[i,j,k]=data[counter]
+			for k=1:xlength
+				DataNew[k,j,i]=data[counter]
 				counter+=1
 			end
 		end
