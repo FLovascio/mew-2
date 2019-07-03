@@ -1,5 +1,15 @@
-include("Mew.jl")
-include("J_FAC.jl")
+#includes
+push!(LOAD_PATH, "~/src/DataAnalysis/Mew-2/")
+using	PorusMedium
+using fargoRead
+import Base.read
+import Base.eof
+using DelimitedFiles
+using Plots
+using LaTeXStrings
+using Plots
+
+
 
 function help()
 		println("

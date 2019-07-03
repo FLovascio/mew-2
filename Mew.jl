@@ -1,9 +1,5 @@
 #includes
-#using Base.read
-#using Base.eof
-#include("PorusMedium.jl")
-push!(LOAD_PATH, "/astro/lovascio/src/Data_Analysis/Mew-2/")
-#include("FARGOread.jl")
+push!(LOAD_PATH, "~/src/DataAnalysis/Mew-2/")
 using	PorusMedium
 using fargoRead
 import Base.read
@@ -12,7 +8,8 @@ using DelimitedFiles
 using Plots
 using LaTeXStrings
 import Plots
-include("Diffusion.jl")
+
+#include("Diffusion.jl")
 
 pyplot()
 #type
