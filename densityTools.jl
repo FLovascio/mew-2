@@ -1,9 +1,9 @@
 #Tools for studying density distributions
 
 module densityTools
-export dustToMass
+export fd
 
-function dustToMass(P,rho,cs²)
+function fd(P,rho,cs²)
 	return 1.0.-(P./(cs².*rho))
 end
 
