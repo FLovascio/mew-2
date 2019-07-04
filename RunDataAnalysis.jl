@@ -1,7 +1,14 @@
 include(MEWDIR*"Mew2.jl")
 
 directory=ARGS[1]
-maxrange=ARGS[2]
+
+
+maxrange = try
+	parse(Int64,ARGS[2])
+catch
+	println("ARG 2 is not a number, use a number")
+	exit()
+end
 
 cd(directory)
 

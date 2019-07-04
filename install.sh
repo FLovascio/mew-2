@@ -1,1 +1,1 @@
-echo "MEWDIR="$PWD >> $HOME/.julia/config/startup.jl
+echo "MEWDIR=\""$PWD"/\"" >> $HOME/.julia/config/startup.jl
