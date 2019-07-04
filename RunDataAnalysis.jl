@@ -2,6 +2,7 @@ include(MEWDIR*"Mew2.jl")
 
 directory=ARGS[1]
 
+using Base.Threads
 
 maxrange = try
 	parse(Int64,ARGS[2])
@@ -14,11 +15,21 @@ cd(directory)
 
 X=makeMesh(3,0)
 
-FFAnimateVorticity(1:maxrange, X)
-FFAnimate("energy",0:maxrange,X)
-FFAnimateFd(25.0,1:maxrange, X)
+function animateVar(i,range,X)
+	if( mod(i,3) == 1)
+		FFAnimateVorticity(range, X);
+	elseif( mod(i,3) == 2)
+		FFAnimate("energy",range,X);
+	else
+		FFAnimateFd(25.0,range, X);
+	end
+	return 0;
+end
 
 
+for i=1:3
+	animateVar(i,1:maxrange, X)
+end
 
 
 
