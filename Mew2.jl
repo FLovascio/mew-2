@@ -1,6 +1,5 @@
-#includes
-Mew2Dir="~/src/DataAnalysis/Mew-2/";
-push!(LOAD_PATH, Mew2Dir)
+#include
+push!(LOAD_PATH, MEWDIR)
 using	PorusMedium
 using fargoRead
 import Base.read

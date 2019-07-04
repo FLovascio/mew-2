@@ -1,4 +1,4 @@
-include("~/src/DataAnalysis/Mew-2/Mew2.jl")
+include(MEWDIR*"Mew2.jl")
 
 directory=ARGS[1]
 maxrange=ARGS[2]
