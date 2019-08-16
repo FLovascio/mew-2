@@ -10,8 +10,9 @@ using LaTeXStrings
 using Plots
 using velocityTools
 import densityTools
+using Plots.PlotMeasures
 
-pyplot();
+gr();
 
 function FFPlot(name,number,X)
     data=fargo_read("gas"*name*string(number)*".dat");
@@ -43,12 +44,12 @@ function FfdMap(cs²,number,X)
     data=fargo_read("gasdens"*string(number)*".dat");
     ρ=toMesh(data,X,false);
     fD=densityTools.fd(P[:,:,1], ρ[:,:,1], cs²)
-		return heatmap(X["x"],X["y"],fD,xlabel="y",ylabel="x",color=:pu_or,framestyle=:box,dpi=300, size=(2000,2000))
+	return heatmap(X["x"],X["y"],fD,xlabel="y",ylabel="x",color=:pu_or,framestyle=:box,colorbar=:top,margin=20.0mm)
 end
 
 function FVorticityMap(number,X)
-    ω=readVorticity(i,X)
-		heatmap(X["x"],X["y"],ω[:,:,1],xlabel="y",ylabel="x",colorbar_title="ω",color=:lime_grad,framestyle=:box,dpi=300, size=(2000,2000))
+    ω=readVorticity(number,X)
+    return heatmap(X["x"],X["y"],ω[:,:,1],xlabel="y",ylabel="x",colorbar_title=" \\omega ",color=:lime_grad,framestyle=:box,margin=20.0mm);
 end
 
 function FFAnimate(name,range,X,col)
