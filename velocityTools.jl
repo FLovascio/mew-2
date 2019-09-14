@@ -42,5 +42,13 @@ function parFDM_Vorticity(ux,uy,X)
 	return ω
 end
 
+function streamFlow(ux,uy,linedensity,X)
+	vx(x,y)=0
+	vy(x,y)=0
+end
+
+function flow_Topology(ux,uy,X)
+
+end
 
 end
