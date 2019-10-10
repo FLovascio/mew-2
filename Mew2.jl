@@ -52,11 +52,11 @@ function FVorticityMap(number,X)
     return heatmap(X["x"],X["y"],ω[:,:,1],xlabel="y",ylabel="x",colorbar_title=" \\omega ",color=:lime_grad,framestyle=:box,margin=20.0mm);
 end
 
-function FStreamPlot(N,X)
+#=function FStreamPlot(N,X)
 	ux=fargo_read("gasvy"*string(N)*".dat")
 	uy=fargo_read("gasvx"*string(N)*".dat")
 	return streamlines(X["x"],X["y"],(ux,uy)),legend = false, colorbar = false, framestyle=:box)
-end
+end=#
 
 function FFAnimate(name,range,X,col)
     an= @animate for i = range

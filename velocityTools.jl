@@ -41,8 +41,6 @@ function parFDM_Vorticity(ux,uy,X)
 	ω[:,end,:]=ω[:,end-1,:]
 	return ω
 end
-
-<<<<<<< HEAD
 function streamFlow(ux,uy,linedensity,X)
 	vx(x,y)=0
 	vy(x,y)=0
@@ -50,7 +48,6 @@ end
 
 function flow_Topology(ux,uy,X)
 
-=======
 function subtract_shear(u,X,Ω)
     v=deepcopy(u)
     for j=1:length(u[:,1])
@@ -59,7 +56,6 @@ function subtract_shear(u,X,Ω)
         end
     end
     return v
->>>>>>> 9129b2f0c8cefe603bfc8aa6c26015774b48e1a9
 end
 
 end
