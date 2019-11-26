@@ -311,6 +311,22 @@ function get_noise_files()
 		return Noises
 end
 
+function get_function_files()
+		Names=search_directory(".csv")
+		Names=map(x->get_name_from_dir(x), Names)
+		Functions=filter(x -> contains(x, "F"),Names)
+		Functions=filter!(x -> !(contains(x, "ANALS")),Functions)
+		return Functions
+end
+
+function get_channel_files()
+		Names=search_directory(".csv")
+		Names=map(x->get_name_from_dir(x), Names)
+		Channels=filter(x -> contains(x, "C"),Names)
+		Channels=filter!(x -> !(contains(x, "ANALS")),Channels)
+		return Channels
+end
+
 function get_sig_files()
 		Names=search_directory(".csv")
 		Names=map(x->get_name_from_dir(x), Names)
@@ -324,11 +340,14 @@ end
 
 #Globals
 
-Signal_Files=get_sig_files()
-Noise_Files=get_noise_files()
-Sigs=Signal_Files
-Noises=Noise_Files
-
+#Signal_Files=get_sig_files()
+#Noise_Files=get_noise_files()
+#Sigs=Signal_Files
+#Noises=Noise_Files
+Function_Files=get_function_files()
+Channel_Files=get_channel_files()
+Fun=Function_Files
+Chan=Channel_Files
 #End
 
 
@@ -401,8 +420,148 @@ function fast_analysis(set::String)
 			DATASTORE=vcat(DATASTORE,DATATEMP)
 		end
 		return DATASTORE
+	elseif set =="functions"||"Functions"
+		FDATASTORE=["NAME" "integral" "std_dev" "Peak" "sig to noise"]
+		for i=1:length(Fun)
+			SD=read_to_SD(Fun[i])
+			SD.t=map(x->1000000*x,SD.t)
+			SD.V=map(x->1000*x,SD.V)
+			ofst=offset(SD)
+			SDpos=strip_negative_time(SD)
+			SDPoffset=SDpos
+			SDPoffset.V=map(x->x-ofst, SDpos.V)
+			SD.V=map(x->x-ofst, SD.V)
+			println("integral: ",num_integrate(SDPoffset))
+			integral=num_integrate(SDPoffset)
+			NEG=strip_positive_time(SD)
+			sdev=Sigma_Noise(NEG.V)
+			Peak=peakfinder(SD.V)
+			println("peak:", Peak)
+			println("Sigma:",sdev)
+			
+			plt=plot(log.(SD.t),log.(SD.V), xlabel=L"log Time")
+			vline!([0.])
+			ylabel!(L"log Voltage")
+			gui(plt)
+			#savefig(plt, get_ID_from_name(Sigs[i]))
+			
+			#SPEC=spectral_series(SD.V)
+			#plts=plot(SPEC)
+			#savefig(plts, "SPEC_"*get_ID_from_name(Sigs[i]))
+			sig_to_noise=Peak/sdev
+			DATATEMP=[Sigs[i] integral sdev Peak sig_to_noise]
+			FDATASTORE=vcat(DATASTORE,DATATEMP)
+		end
+		writedlm("FunANALS.csv",FDATASTORE,",")
+		return FDATASTORE
+		elseif set =="channels"||"Channels"
+			FDATASTORE=["NAME" "integral" "std_dev" "Peak" "sig to noise"]
+			for i=1:length(Chan)
+				SD=read_to_SD(Chan[i])
+				SD.t=map(x->1000000*x,SD.t)
+				SD.V=map(x->1000*x,SD.V)
+				ofst=offset(SD)
+				SDpos=strip_negative_time(SD)
+				SDPoffset=SDpos
+				SDPoffset.V=map(x->x-ofst, SDpos.V)
+				SD.V=map(x->x-ofst, SD.V)
+				println("integral: ",num_integrate(SDPoffset))
+				integral=num_integrate(SDPoffset)
+				NEG=strip_positive_time(SD)
+				sdev=Sigma_Noise(NEG.V)
+				Peak=peakfinder(SD.V)
+				println("peak:", Peak)
+				println("Sigma:",sdev)
+				
+				plt=plot(log.(SDPoffset.t),log.(SDPoffset.V), xlabel=L"Time ($\mu s$)")
+				vline!([0.])
+				ylabel!(L"Voltage (mV)")
+				gui(plt)
+				#savefig(plt, get_ID_from_name(Sigs[i]))
+				
+				#SPEC=spectral_series(SD.V)
+				#plts=plot(SPEC)
+				#savefig(plts, "SPEC_"*get_ID_from_name(Sigs[i]))
+				sig_to_noise=Peak/sdev
+				DATATEMP=[Sigs[i] integral sdev Peak sig_to_noise]
+				FDATASTORE=vcat(DATASTORE,DATATEMP)
+			end
+			writedlm("ChANALS.csv",CDATASTORE,",")
+			return CDATASTORE
 	end
+
 end
+
+function Fast_Channels()
+			CDATASTORE=["NAME" "integral" "std_dev" "Peak" "sig to noise"]
+			for i=1:length(Chan)
+				SD=read_to_SD(Chan[i])
+				SD.t=map(x->1000000*x,SD.t)
+				SD.V=map(x->1000*x,SD.V)
+				ofst=offset(SD)
+				SDpos=strip_negative_time(SD)
+				SDPoffset=SDpos
+				SDPoffset.V=map(x->x-ofst, SDpos.V)
+				SD.V=map(x->x-ofst, SD.V)
+				println("integral: ",num_integrate(SDPoffset))
+				integral=num_integrate(SDPoffset)
+				NEG=strip_positive_time(SD)
+				sdev=Sigma_Noise(NEG.V)
+				Peak=peakfinder(SD.V)
+				println("peak:", Peak)
+				println("Sigma:",sdev)
+				
+				plt=plot(SD.t,SD.V, xlabel="Time (µs)")
+				vline!([0.])
+				ylabel!("Voltage (mV)")
+				title!(Chan[i])
+				gui(plt)
+				#savefig(plt, get_ID_from_name(Sigs[i]))
+				
+				#SPEC=spectral_series(SD.V)
+				#plts=plot(SPEC)
+				#savefig(plts, "SPEC_"*get_ID_from_name(Sigs[i]))
+				sig_to_noise=Peak/sdev
+				DATATEMP=[Chan[i] integral sdev Peak sig_to_noise]
+				CDATASTORE=vcat(CDATASTORE,DATATEMP)
+			end
+		writedlm("ChANALS.csv",CDATASTORE,",")
+	return CDATASTORE
+end
+
+function Fast_Functions()
+		FDATASTORE=["NAME" "integral" "std_dev" "Peak" "sig to noise"]
+		for i=1:length(Fun)
+			SD=read_to_SD(Fun[i])
+			SD.t=map(x->1000000*x,SD.t)
+			SD.V=map(x->1000*x,SD.V)
+			ofst=offset(SD)
+			SDpos=strip_negative_time(SD)
+			SDPoffset=SDpos
+			SDPoffset.V=map(x->x-ofst, SDpos.V)
+			SDpos.V=map(x->abs(x), SDpos.V)
+			SD.V=map(x->x-ofst, SD.V)
+			println("integral: ",num_integrate(SDPoffset))
+			integral=num_integrate(SDPoffset)
+			NEG=strip_positive_time(SD)
+			sdev=Sigma_Noise(NEG.V)
+			Peak=peakfinder(SD.V)
+			println("peak:", Peak)
+			println("Sigma:",sdev)
+			
+			plt=plot(SDpos.t,SDpos.V,seriestype=:scatter,xscale=:log10,yscale=:log10, xlabel="log Time (µs)",fillto=1e-6)
+			#vline!([0.])
+			ylabel!("log Voltage (mV)")
+			title!(Fun[i])
+			gui(plt)
+			sig_to_noise=Peak/sdev
+			DATATEMP=[Fun[i] integral sdev Peak sig_to_noise]
+			FDATASTORE=vcat(FDATASTORE,DATATEMP)
+		end
+		writedlm("FunANALS.csv",FDATASTORE,",")
+		return FDATASTORE
+end
+
 
 function PlotLaTeX(file::String)
 		SD=read_to_SD(file)

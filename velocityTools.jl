@@ -1,7 +1,7 @@
 #Tools for studying velocity distributions
 
 module velocityTools
-export FFT_Vorticity, FDM_Vorticity, parFDM_Vorticity
+export FFT_Vorticity, FDM_Vorticity, parFDM_Vorticity, subtract_shear
 
 using FFTW
 using Base.Threads
@@ -41,6 +41,21 @@ function parFDM_Vorticity(ux,uy,X)
 	ω[:,end,:]=ω[:,end-1,:]
 	return ω
 end
+function streamFlow(ux,uy,linedensity,X)
+	vx(x,y)=0
+	vy(x,y)=0
+end
 
+function flow_Topology(ux,uy,X)
+
+function subtract_shear(u,X,Ω)
+    v=deepcopy(u)
+    for j=1:length(u[:,1])
+        for i=1:length(u[1,:])
+            v[i,j]=u[i,j]-X["y"][j]*Ω
+        end
+    end
+    return v
+end
 
 end
