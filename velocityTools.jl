@@ -46,8 +46,6 @@ function streamFlow(ux,uy,linedensity,X)
 	vy(x,y)=0
 end
 
-function flow_Topology(ux,uy,X)
-
 function subtract_shear(u,X,Ω)
     v=deepcopy(u)
     for j=1:length(u[:,1])
