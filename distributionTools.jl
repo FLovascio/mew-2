@@ -1,46 +1,39 @@
 #Tools for studying velocity distributions
 
-module velocityTools
-export FFT_Vorticity, FDM_Vorticity, parFDM_Vorticity
+module distributionTools
+export fullWidthHalfMax
 
-using FFTW
 using Base.Threads
 
-function FFT_Vorticity(ux,uy)
+findMax(A)=(argmax(A),A[argmax(A)])
+
+function subtractHalfMax(A)
+	i,Max=findMax(A)
+	return A.-(Max/2.0)
 end
 
-function FDM_Vorticity(ux,uy,X)
-	ω=deepcopy(ux)
-	for j=2:(length(ux[:,1])-1)
-		for i=2:(length(ux[1,:])-1)
-			Δx=X["x"][i+1]-X["x"][i-1]
-			Δy=X["y"][j+1]-X["y"][j-1]
-			ω[i,j]=((uy[i+1,j,1]-uy[i-1,j,1])/Δx) -((ux[i,j+1,1]-ux[i,j-1,1])/Δy)
-		end
+function signChange(A)
+	HA=deepcopy(A)
+	for i ∈ CartesianIndices(A[2:end,:])
+		HA=sign(A[i]*A[i+CartesianIndex(1,0)])
 	end
-	ω[1,:,:]=ω[2,:,:]
-	ω[end,:,:]=ω[end-1,:,:]
-	ω[:,1,:]=ω[:,2,:]
-	ω[:,end,:]=ω[:,end-1,:]
-	return ω
+	HA[1,:].=0
+	HA[end,:].=0
+	HA[:,1].=0
+	HA[:,end].=0
+	return HA
 end
 
-function parFDM_Vorticity(ux,uy,X)
-	ω=deepcopy(ux)
-	@threads for j=2:(length(ux[:,1])-1)
-		for i=2:(length(ux[1,:])-1)
-			#Δx=X["x"][i+1]-X["x"][i-1]
-			#Δy=X["y"][j+1]-X["y"][j-1]
-			ω[i,j]=((uy[i+1,j,1]-uy[i-1,j,1])/(X["x"][i+1]-X["x"][i-1])) -((ux[i,j+1,1]-ux[i,j-1,1])/(X["y"][j+1]-X["y"][j-1])
-)
-		end
+function FWHM(HA)
+	HWA=deepcopy(HA)
+	for i ∈ CartesianIndices(HA)
+		HHA=HA[i]<0?1:0
 	end
-	ω[1,:,:]=ω[2,:,:]
-	ω[end,:,:]=ω[end-1,:,:]
-	ω[:,1,:]=ω[:,2,:]
-	ω[:,end,:]=ω[:,end-1,:]
-	return ω
+	return HHA
 end
 
+function fullWidthHalfMax(A)
+	return FWHM(signChange(subtractHalfMax(A)))
+end
 
 end

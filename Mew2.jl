@@ -1,6 +1,7 @@
 #include
 push!(LOAD_PATH, MEWDIR)
 using	PorusMedium
+using distributionTools
 using fargoRead
 import Base.read
 import Base.eof
