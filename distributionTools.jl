@@ -27,7 +27,7 @@ end
 function FWHM(HA)
 	HWA=deepcopy(HA)
 	for i ∈ CartesianIndices(HA)
-		HHA=HA[i]<0?1:0
+		HHA=HA[i]<0 ? 1 : 0
 	end
 	return HHA
 end
